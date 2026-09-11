@@ -57,13 +57,13 @@ Add `logger` to your project's `alya.toml`:
 
 ```toml
 [dependencies]
-logger = { git = "https://github.com/alya-lang/logger", tag = "v0.1.0" }
+logger = { git = "https://github.com/alya-lang/logger", branch = "main" }
 ```
 
 Or install it directly via the Alya CLI:
 
 ```bash
-alyac add logger --git https://github.com/alya-lang/logger --tag v0.1.0
+alyac add logger --git https://github.com/alya-lang/logger --branch main
 alyac install
 ```
 
