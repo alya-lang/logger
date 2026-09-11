@@ -1,0 +1,63 @@
+# Console, File, and RollingFile appenders
+# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
+import "../types.alya"
+import "./utils.alya"
+
+# Outputs line to console stdout
+function append_console(line)
+    say line
+end
+
+# Appends line to a target file (strips ANSI color codes)
+function append_to_file(path, line)
+    let clean = ansi_strip(line)
+    append_file(path, clean + "\n")
+end
+
+# Rotates log file if it exceeds max_size bytes
+# Backups are named path.1, path.2, ... path.<max_files>
+function rotate_log_file(path, max_files)
+    if max_files <= 0
+        remove_file(path)
+        return 1
+    end
+
+    # 1. Remove oldest backup if it exists
+    let oldest = path + "." + str(max_files)
+    if file_exists(oldest) == 1
+        remove_file(oldest)
+    end
+
+    # 2. Shift backups down (.2 -> .3, .1 -> .2)
+    let i = max_files - 1
+    while i >= 1
+        let cur = path + "." + str(i)
+        let nxt = path + "." + str(i + 1)
+        if file_exists(cur) == 1
+            file_move(cur, nxt)
+        end
+        i -= 1
+    end
+
+    # 3. Move current active log to .1
+    let first = path + ".1"
+    file_move(path, first)
+    return 1
+end
+
+# Appends line to rolling file, rotating if needed
+function append_to_rolling_file(path, line, max_size, max_files)
+    let clean = ansi_strip(line)
+    let content = clean + "\n"
+    let line_len = len(content)
+
+    if max_size > 0 and file_exists(path) == 1
+        let cur_size = file_size(path)
+        if cur_size + line_len > max_size
+            rotate_log_file(path, max_files)
+        end
+    end
+
+    append_file(path, content)
+end

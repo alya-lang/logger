@@ -1,0 +1,143 @@
+# Core Logger methods, dispatching, and field management
+# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
+import "../types.alya"
+import "./utils.alya"
+import "./levels.alya"
+import "./formatters.alya"
+import "./appenders.alya"
+
+# Dispatches formatted message across configured appenders
+function logger_dispatch(l, formatted)
+    let num_apps = len(l.log_appenders)
+    if num_apps > 0
+        let i = 0
+        while i < num_apps
+            let app = l.log_appenders[i]
+            if app.app_type == 1
+                append_console(formatted)
+            elif app.app_type == 2
+                append_to_file(app.app_target, formatted)
+            elif app.app_type == 3
+                append_to_rolling_file(app.app_target, formatted, app.app_max_size, app.app_max_files)
+            end
+            i += 1
+        end
+    else
+        # Default behavior: Console output + optional log_file
+        say formatted
+        let fpath = str_from_ptr(l.log_file)
+        if len(fpath) > 0
+            append_to_file(fpath, formatted)
+        end
+    end
+end
+
+# Primary logging function
+function logger_log(l, level, message)
+    if level < l.log_level or l.log_level == 6
+        return 0
+    end
+
+    let rec = record_new(level, message, l.log_name, time(), l.log_fields)
+    let formatted = ""
+    if l.log_format == 2
+        formatted = format_json(rec)
+    else
+        formatted = format_text(rec, l.log_colored, l.log_timestamps)
+    end
+
+    logger_dispatch(l, formatted)
+    return 1
+end
+
+# Logs with extra call-site structured fields
+function logger_log_with_fields(l, level, message, extra_fields)
+    if level < l.log_level or l.log_level == 6
+        return 0
+    end
+
+    let all_fields = []
+    let i = 0
+    while i < len(l.log_fields)
+        all_fields.push(l.log_fields[i])
+        i += 1
+    end
+    let j = 0
+    while j < len(extra_fields)
+        all_fields.push(extra_fields[j])
+        j += 1
+    end
+
+    let rec = record_new(level, message, l.log_name, time(), all_fields)
+    let formatted = ""
+    if l.log_format == 2
+        formatted = format_json(rec)
+    else
+        formatted = format_text(rec, l.log_colored, l.log_timestamps)
+    end
+
+    logger_dispatch(l, formatted)
+    return 1
+end
+
+# Configuration / fluent setters
+function logger_set_level(l, level)
+    l.log_level = level
+end
+
+function logger_set_colored(l, colored)
+    l.log_colored = colored
+end
+
+function logger_set_timestamps(l, timestamps)
+    l.log_timestamps = timestamps
+end
+
+function logger_set_file(l, file_path)
+    l.log_file = str_from_ptr(file_path)
+end
+
+function logger_set_format(l, format)
+    l.log_format = format
+end
+
+function logger_add_console(l)
+    l.log_appenders.push(appender_console())
+end
+
+function logger_add_file(l, path)
+    l.log_appenders.push(appender_file(path))
+end
+
+function logger_add_rolling_file(l, path, max_size, max_files)
+    l.log_appenders.push(appender_rolling(path, max_size, max_files))
+end
+
+function logger_add_field(l, key, value)
+    l.log_fields.push(field_new(key, value))
+end
+
+function logger_clear_appenders(l)
+    l.log_appenders = []
+end
+
+function logger_clear_fields(l)
+    l.log_fields = []
+end
+
+# Leveled convenience logging methods
+function logger_trace(l, msg) return logger_log(l, 0, msg) end
+function logger_debug(l, msg) return logger_log(l, 1, msg) end
+function logger_info(l, msg)  return logger_log(l, 2, msg) end
+function logger_warn(l, msg)  return logger_log(l, 3, msg) end
+function logger_error(l, msg) return logger_log(l, 4, msg) end
+function logger_fatal(l, msg) return logger_log(l, 5, msg) end
+
+# Leveled logging with call-site fields
+function logger_trace_fields(l, msg, fields) return logger_log_with_fields(l, 0, msg, fields) end
+function logger_debug_fields(l, msg, fields) return logger_log_with_fields(l, 1, msg, fields) end
+function logger_info_fields(l, msg, fields)  return logger_log_with_fields(l, 2, msg, fields) end
+function logger_warn_fields(l, msg, fields)  return logger_log_with_fields(l, 3, msg, fields) end
+function logger_error_fields(l, msg, fields) return logger_log_with_fields(l, 4, msg, fields) end
+function logger_fatal_fields(l, msg, fields) return logger_log_with_fields(l, 5, msg, fields) end

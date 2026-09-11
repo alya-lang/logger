@@ -1,28 +1,68 @@
-# Test suite for logger
+# Test suite for Logger basic functionality and lifecycle
 import "std/test"
-import "../src/lib.alya" as pkg
+import "../src/lib.alya" as log
 
 function main()
-    test_suite("logger Test Suite")
+    test_suite("Logger Basic Functionality Tests")
     let r = runner_new()
 
-    # 1. Basic facade function
-    let res = pkg::hello("Alya")
-    runner_assert_str_eq(r, res, "Hello, Alya!", "pkg::hello returns formatted greeting")
+    # 1. Logger creation
+    let l = log::create("TestApp", log::LOG_INFO())
+    runner_assert_str_eq(r, l.log_name, "TestApp", "logger name is TestApp")
+    runner_assert_eq(r, l.log_level, log::LOG_INFO(), "default level is LOG_INFO")
+    runner_assert_eq(r, l.log_colored, 1, "colored is enabled by default")
+    runner_assert_eq(r, l.log_timestamps, 0, "timestamps are disabled by default")
+    runner_assert_eq(r, l.log_format, log::FORMAT_TEXT(), "default format is FORMAT_TEXT")
+    runner_assert_eq(r, len(l.log_appenders), 0, "default appenders list is empty")
+    runner_assert_eq(r, len(l.log_fields), 0, "default fields list is empty")
 
-    # 2. Default parameter
-    let default_res = pkg::hello()
-    runner_assert_str_eq(r, default_res, "Hello, World!", "pkg::hello() uses default name")
+    # 2. Configuration setters
+    log::logger_set_level(l, log::LOG_DEBUG())
+    runner_assert_eq(r, l.log_level, log::LOG_DEBUG(), "set_level updates to LOG_DEBUG")
 
-    # 3. Modular types & config constructor
-    let cfg = pkg::new_config("Community", 3)
-    runner_assert_str_eq(r, cfg.name, "Community", "pkg::new_config sets name correctly")
-    runner_assert_str_eq(r, cfg.prefix, "Hello", "pkg::new_config sets default prefix")
-    runner_assert_eq(r, cfg.count, 3, "pkg::new_config sets count correctly")
+    log::logger_set_colored(l, 0)
+    runner_assert_eq(r, l.log_colored, 0, "set_colored updates to 0")
 
-    # 4. Core custom formatter using struct
-    let custom_res = pkg::core_format_custom(cfg)
-    runner_assert_str_eq(r, custom_res, "Hello, Community!", "pkg::core_format_custom formats using config")
+    log::logger_set_timestamps(l, 1)
+    runner_assert_eq(r, l.log_timestamps, 1, "set_timestamps updates to 1")
+
+    log::logger_set_format(l, log::FORMAT_JSON())
+    runner_assert_eq(r, l.log_format, log::FORMAT_JSON(), "set_format updates to FORMAT_JSON")
+
+    log::logger_set_file(l, "temp_test.log")
+    runner_assert_str_eq(r, l.log_file, "temp_test.log", "set_file updates log_file path")
+
+    # 3. Fields management
+    log::logger_add_field(l, "env", "test")
+    log::logger_add_field(l, "version", "1.0.0")
+    runner_assert_eq(r, len(l.log_fields), 2, "logger has 2 context fields")
+    let f1 = l.log_fields[0]
+    runner_assert_str_eq(r, f1.fld_key, "env", "field 0 key is env")
+    runner_assert_str_eq(r, f1.fld_value, "test", "field 0 value is test")
+
+    log::logger_clear_fields(l)
+    runner_assert_eq(r, len(l.log_fields), 0, "clear_fields empties field list")
+
+    # 4. Field constructor
+    let custom_fld = log::field("user_id", "42")
+    runner_assert_str_eq(r, custom_fld.fld_key, "user_id", "field helper sets key")
+    runner_assert_str_eq(r, custom_fld.fld_value, "42", "field helper sets value")
+
+    # 5. Record constructor
+    let rec = log::record(log::LOG_WARN(), "Disk space low", "storage", 1700000000, [custom_fld])
+    runner_assert_eq(r, rec.rec_level, log::LOG_WARN(), "record level is LOG_WARN")
+    runner_assert_str_eq(r, rec.rec_msg, "Disk space low", "record msg matches")
+    runner_assert_str_eq(r, rec.rec_target, "storage", "record target matches")
+    runner_assert_eq(r, rec.rec_time, 1700000000, "record timestamp matches")
+    runner_assert_eq(r, len(rec.rec_fields), 1, "record fields count is 1")
+
+    # 6. Level filtering logic
+    let filter_logger = log::create("FilterTest", log::LOG_WARN())
+    runner_assert_eq(r, log::logger_log(filter_logger, log::LOG_DEBUG(), "Ignored"), 0, "DEBUG ignored when level is WARN")
+    runner_assert_eq(r, log::logger_log(filter_logger, log::LOG_INFO(), "Ignored"), 0, "INFO ignored when level is WARN")
+
+    let off_logger = log::create("OffTest", log::LOG_OFF())
+    runner_assert_eq(r, log::logger_log(off_logger, log::LOG_FATAL(), "Ignored"), 0, "FATAL ignored when level is OFF")
 
     let failed = runner_summary(r)
     if failed > 0

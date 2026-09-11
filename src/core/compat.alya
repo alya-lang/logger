@@ -1,0 +1,39 @@
+# 100% Backward Compatibility Layer with std/log
+# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
+import "../types.alya"
+import "./levels.alya"
+import "./logger.alya"
+
+# Global direct logging functions matching std/log
+function log_trace(msg)
+    say "\e[90m[TRACE] \e[0m" + str_from_ptr(msg)
+end
+
+function log_debug(msg)
+    say "\e[36m[DEBUG] \e[0m" + str_from_ptr(msg)
+end
+
+function log_info(msg)
+    say "\e[32m[INFO]  \e[0m" + str_from_ptr(msg)
+end
+
+function log_warn(msg)
+    say "\e[33m[WARN]  \e[0m" + str_from_ptr(msg)
+end
+
+function log_error(msg)
+    say "\e[31m[ERROR] \e[0m" + str_from_ptr(msg)
+end
+
+function log_fatal(msg)
+    say "\e[1;91m[FATAL] \e[0m" + str_from_ptr(msg)
+end
+
+function log_level_name(lvl)
+    return level_to_str(lvl)
+end
+
+function log_level_from_str(s)
+    return level_from_str(s)
+end

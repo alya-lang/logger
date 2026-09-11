@@ -1,0 +1,75 @@
+# Test suite for Rolling File Appender and Size-based Log Rotation
+import "std/test"
+import "../src/lib.alya" as log
+
+function cleanup_files(base)
+    if file_exists(base) == 1
+        remove_file(base)
+    end
+    if file_exists(base + ".1") == 1
+        remove_file(base + ".1")
+    end
+    if file_exists(base + ".2") == 1
+        remove_file(base + ".2")
+    end
+    if file_exists(base + ".3") == 1
+        remove_file(base + ".3")
+    end
+end
+
+function main()
+    test_suite("Logger File Rotation Tests")
+    let r = runner_new()
+
+    let base_log = "temp_rotation_test.log"
+    cleanup_files(base_log)
+
+    # 1. Initialize logger with rolling file appender (max_size = 70 bytes, max_files = 2)
+    let rot_logger = log::create("RotApp", log::LOG_INFO())
+    log::logger_set_colored(rot_logger, 0)
+    log::logger_add_rolling_file(rot_logger, base_log, 90, 2)
+
+    # Write log 1 (~30 bytes)
+    log::logger_info(rot_logger, "Log message number one")
+    runner_assert_eq(r, file_exists(base_log), 1, "initial log file created")
+    runner_assert_eq(r, file_exists(base_log + ".1"), 0, "backup .1 does not exist yet")
+
+    # Write log 2 (~30 bytes, total ~60 <= 70)
+    log::logger_info(rot_logger, "Log message number two")
+    runner_assert_eq(r, file_exists(base_log), 1, "active log file continues")
+    runner_assert_eq(r, file_exists(base_log + ".1"), 0, "backup .1 still does not exist")
+
+    # Write log 3 (~30 bytes, total 60 + 30 = 90 > 70 -> triggers first rotation)
+    log::logger_info(rot_logger, "Log message number three")
+    runner_assert_eq(r, file_exists(base_log), 1, "active log file exists after rotation")
+    runner_assert_eq(r, file_exists(base_log + ".1"), 1, "backup .1 created on rotation")
+    runner_assert_eq(r, file_exists(base_log + ".2"), 0, "backup .2 does not exist yet")
+
+    # Verify backup .1 contains message 1 and 2
+    let b1_content = read_file(base_log + ".1")
+    runner_assert_true(r, len(b1_content) > 0, "backup .1 has content")
+
+    # Write log 4 (~30 bytes)
+    log::logger_info(rot_logger, "Log message number four")
+
+    # Write log 5 (~30 bytes, triggers second rotation -> .1 moves to .2, active moves to .1)
+    log::logger_info(rot_logger, "Log message number five")
+    runner_assert_eq(r, file_exists(base_log + ".2"), 1, "backup .2 created on second rotation")
+    runner_assert_eq(r, file_exists(base_log + ".1"), 1, "backup .1 exists on second rotation")
+
+    # Write log 6 & 7 (triggers third rotation -> oldest .2 replaced, .3 is NOT created because max_files=2)
+    log::logger_info(rot_logger, "Log message number six")
+    log::logger_info(rot_logger, "Log message number seven")
+    runner_assert_eq(r, file_exists(base_log + ".3"), 0, "backup .3 is never created (max_files=2)")
+    runner_assert_eq(r, file_exists(base_log + ".2"), 1, "backup .2 retained")
+    runner_assert_eq(r, file_exists(base_log + ".1"), 1, "backup .1 retained")
+
+    cleanup_files(base_log)
+
+    let failed = runner_summary(r)
+    if failed > 0
+        exit(1)
+    end
+end
+
+main()

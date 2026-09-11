@@ -1,0 +1,58 @@
+# Log level conversions, labels, and ANSI styling
+# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
+import "../types.alya"
+
+function level_to_str(lvl)
+    if lvl == 0 return "TRACE" end
+    if lvl == 1 return "DEBUG" end
+    if lvl == 2 return "INFO" end
+    if lvl == 3 return "WARN" end
+    if lvl == 4 return "ERROR" end
+    if lvl == 5 return "FATAL" end
+    if lvl == 6 return "OFF" end
+    return "LOG"
+end
+
+function level_from_str(s)
+    let up = upper(str_from_ptr(s))
+    if up == "TRACE" return 0 end
+    if up == "DEBUG" return 1 end
+    if up == "INFO" return 2 end
+    if up == "WARN" or up == "WARNING" return 3 end
+    if up == "ERROR" return 4 end
+    if up == "FATAL" return 5 end
+    if up == "OFF" return 6 end
+    return 2
+end
+
+function _ansi_esc(code, s)
+    return "\e[" + code + "m" + str_from_ptr(s) + "\e[0m"
+end
+
+function level_badge(lvl, colored)
+    let name = level_to_str(lvl)
+    let badge = "[" + name + "]"
+    while len(badge) < 7
+        badge = badge + " "
+    end
+
+    if colored == 0
+        return badge
+    end
+
+    if lvl == 0
+        return _ansi_esc("90", badge)      # Gray
+    elif lvl == 1
+        return _ansi_esc("36", badge)      # Cyan
+    elif lvl == 2
+        return _ansi_esc("32", badge)      # Green
+    elif lvl == 3
+        return _ansi_esc("33", badge)      # Yellow
+    elif lvl == 4
+        return _ansi_esc("31", badge)      # Red
+    elif lvl == 5
+        return _ansi_esc("1;91", badge)    # Bold Bright Red
+    end
+    return badge
+end

@@ -1,15 +1,92 @@
-# Example usage of logger
-import "../src/lib.alya" as pkg
+# Alya Logger - Comprehensive Feature Demonstration
+import "../src/lib.alya" as log
 
 function main()
-    # Basic greeting
-    let msg = pkg::hello("Alya Developer")
-    say msg
+    say "=================================================="
+    say "       Alya Logger (alya-lang/logger) Demo        "
+    say "=================================================="
 
-    # Using configuration struct
-    let cfg = pkg::new_config("Modular Architecture", 5)
-    say "Target: " + cfg.name
-    say "Formatted: " + pkg::core_format_custom(cfg)
+    # 1. Quick Global Leveled Logging
+    say "\n--- 1. Quick Global Logging ---"
+    log::log_trace("Entering application initialization phase")
+    log::log_debug("Configuration file loaded from /etc/app.json")
+    log::log_info("HTTP server initialized on 0.0.0.0:8080")
+    log::log_warn("High memory utilization detected: 78%")
+    log::log_error("Database connection timeout, retrying (1/3)")
+    log::log_fatal("Fatal: Out of unrecoverable workers!")
+
+    # 2. Structured Component Logger with Timestamps
+    say "\n--- 2. Structured Component Logger with Timestamps ---"
+    let app_log = log::create("ApiGateway", log::LOG_DEBUG())
+    log::logger_set_timestamps(app_log, 1)
+
+    log::logger_debug(app_log, "Incoming request: GET /api/v1/users")
+    log::logger_info(app_log, "Handled 200 OK in 14ms")
+    log::logger_warn(app_log, "Rate limit threshold reached for client 192.168.1.100")
+
+    # 3. Structured Key-Value Fields (Text Format)
+    say "\n--- 3. Structured Fields (Text Format) ---"
+    let auth_log = log::create("AuthService", log::LOG_INFO())
+    log::logger_set_timestamps(auth_log, 1)
+    log::logger_add_field(auth_log, "env", "production")
+
+    let call_fields = [
+        log::field("user_id", "4092"),
+        log::field("role", "admin"),
+        log::field("ip", "10.0.4.15")
+    ]
+    log::logger_info_fields(auth_log, "User session authenticated", call_fields)
+
+    # 4. JSON Format Output
+    say "\n--- 4. JSON Formatted Output ---"
+    let json_log = log::create("Metrics", log::LOG_INFO())
+    log::logger_set_format(json_log, log::FORMAT_JSON())
+
+    let metrics_fields = [
+        log::field("cpu_usage", "24.5%"),
+        log::field("mem_used_mb", "512"),
+        log::field("active_threads", "8")
+    ]
+    log::logger_info_fields(json_log, "System telemetry report", metrics_fields)
+
+    # 5. Multi-Appender & File Rotation Demo
+    say "\n--- 5. Rolling File Appender & Rotation ---"
+    let demo_log = "demo_app.log"
+    if file_exists(demo_log) == 1
+        remove_file(demo_log)
+    end
+    if file_exists(demo_log + ".1") == 1
+        remove_file(demo_log + ".1")
+    end
+
+    let file_log = log::create("RollingDemo", log::LOG_INFO())
+    log::logger_set_colored(file_log, 0)
+    log::logger_add_console(file_log)
+    log::logger_add_rolling_file(file_log, demo_log, 150, 3)
+
+    say "Writing logs to rolling file (max 150 bytes per file)..."
+    log::logger_info(file_log, "Log entry A (demonstrating rolling appender)")
+    log::logger_info(file_log, "Log entry B (reaching threshold)")
+    log::logger_info(file_log, "Log entry C (triggers automatic rotation to .1)")
+
+    say "Active file exists: " + str(file_exists(demo_log))
+    say "Backup .1 exists : " + str(file_exists(demo_log + ".1"))
+
+    # Clean up demo files
+    if file_exists(demo_log) == 1
+        remove_file(demo_log)
+    end
+    if file_exists(demo_log + ".1") == 1
+        remove_file(demo_log + ".1")
+    end
+
+    # 6. Backward Compatibility with std/log
+    say "\n--- 6. std/log 100%% Backward Compatibility ---"
+    let legacy_log = log::logger_new("LegacyWorker", 2)
+    log::logger_set_timestamps(legacy_log, 1)
+    log::logger_info(legacy_log, "Legacy logger_info call working perfectly")
+
+    say "\n✓ Logger demonstration completed successfully."
 end
 
 main()

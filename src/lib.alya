@@ -1,14 +1,31 @@
-# logger library
+# Modern structured logging, leveled output, JSON format, and file rotation for Alya
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
 import "./types.alya"
-import "./core/formatter.alya"
+import "./core/utils.alya"
+import "./core/levels.alya"
+import "./core/formatters.alya"
+import "./core/appenders.alya"
+import "./core/logger.alya"
+import "./core/compat.alya"
 
-# Public facade functions
-function hello(name = "World")
-    return core_format_greeting(name)
+# Top-level factory function
+function create(name = "", level = 2)
+    return logger_new(name, level)
 end
 
-function new_config(name = "World", count = 1)
-    return make_config(name, count)
+function field(key, value)
+    return field_new(key, value)
+end
+
+function record(level, msg, target, timestamp, fields)
+    return record_new(level, msg, target, timestamp, fields)
+end
+
+function format_record_text(rec, colored = 0, timestamps = 0)
+    return format_text(rec, colored, timestamps)
+end
+
+function format_record_json(rec)
+    return format_json(rec)
 end
