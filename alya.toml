@@ -1,6 +1,6 @@
 [package]
 name = "logger"
-version = "0.1.0"
+version = "0.2.0"
 alya-version = "0.0.9"
 entry = "src/lib.alya"
 description = "Structured logging, leveled output, JSON format, and file rotation for Alya"
