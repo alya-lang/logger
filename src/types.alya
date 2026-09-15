@@ -93,9 +93,7 @@ function appender_rolling(path, max_size_bytes, max_files)
 end
 
 # Main Logger struct
-# First 5 fields (log_name, log_level, log_colored, log_timestamps, log_file)
-# match std/log exactly for 100% binary/field compatibility.
-struct Logger
+struct AppLogger
     log_name
     log_level
     log_colored
@@ -107,5 +105,5 @@ struct Logger
 end
 
 function logger_new(name = "", level = 2)
-    return Logger(str_from_ptr(name), level, 1, 0, "", 1, [], [])
+    return AppLogger(str_from_ptr(name), level, 1, 0, "", 1, [], [])
 end

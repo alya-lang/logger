@@ -17,7 +17,6 @@ Structured logging, leveled output, JSON format, and size-based file rotation fo
 - 📊 **Dual Formatting**: Human-friendly ANSI color badges in text mode, or compact escaped JSON objects for log aggregators (ELK, Datadog, CloudWatch).
 - 🔄 **Size-Based File Rotation**: Built-in rolling file appender automatically archives logs once a size limit is reached, maintaining a configurable number of backup files (`.1`, `.2`, ...).
 - 🔀 **Multi-Appender Architecture**: Fan-out log entries simultaneously across console output, static log files, and rolling log archives.
-- 🤝 **100% Backward Compatible**: Drop-in replacement for the `std/log` standard library module.
 
 ---
 
@@ -34,8 +33,7 @@ logger/
 │       ├── levels.alya        # Level conversions and ANSI badges
 │       ├── formatters.alya    # Text and JSON formatters
 │       ├── appenders.alya     # Console, File, RollingFile appenders
-│       ├── logger.alya        # Core logger dispatching & methods
-│       └── compat.alya        # 100% std/log compatibility bridge
+│       └── logger.alya        # Core logger dispatching & methods
 ├── examples/
 │   └── demo.alya              # Full feature demonstration
 ├── tests/
@@ -43,8 +41,7 @@ logger/
 │   ├── test_levels.alya       # Level parsing, badges, and filters
 │   ├── test_json.alya         # JSON serialization & string escaping
 │   ├── test_appenders.alya    # Console and File appenders
-│   ├── test_rotation.alya     # Size threshold & file rotation limits
-│   └── test_compat.alya       # std/log backward compatibility tests
+│   └── test_rotation.alya     # Size threshold & file rotation limits
 └── benches/
     └── bench_basic.alya       # Micro-benchmark suite
 ```

@@ -58,9 +58,9 @@ function main()
     runner_assert_str_eq(r, log::ansi_strip(b_color_info), "[INFO] ", "stripping ANSI from colored badge yields plain")
     runner_assert_str_eq(r, log::ansi_strip(b_color_warn), "[WARN] ", "stripping ANSI from colored badge yields plain")
 
-    # 6. Backward compatibility aliases
-    runner_assert_str_eq(r, log::log_level_name(log::LOG_INFO()), "INFO", "log_level_name matches INFO")
-    runner_assert_eq(r, log::log_level_from_str("ERROR"), log::LOG_ERROR(), "log_level_from_str matches ERROR")
+    # 6. Canonical level conversions
+    runner_assert_str_eq(r, log::level_to_str(log::LOG_INFO()), "INFO", "level_to_str matches INFO")
+    runner_assert_eq(r, log::level_from_str("ERROR"), log::LOG_ERROR(), "level_from_str matches ERROR")
 
     let failed = runner_summary(r)
     if failed > 0

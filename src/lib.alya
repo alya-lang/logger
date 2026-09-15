@@ -7,7 +7,6 @@ import "./core/levels.alya"
 import "./core/formatters.alya"
 import "./core/appenders.alya"
 import "./core/logger.alya"
-import "./core/compat.alya"
 
 # Top-level factory function
 function create(name = "", level = 2)
@@ -29,3 +28,31 @@ end
 function format_record_json(rec)
     return format_json(rec)
 end
+
+# Clean namespaced logger methods
+function info(l, msg) return logger_info(l, msg) end
+function warn(l, msg) return logger_warn(l, msg) end
+function error(l, msg) return logger_error(l, msg) end
+function debug(l, msg) return logger_debug(l, msg) end
+function trace(l, msg) return logger_trace(l, msg) end
+function fatal(l, msg) return logger_fatal(l, msg) end
+
+function info_fields(l, msg, fields) return logger_info_fields(l, msg, fields) end
+function warn_fields(l, msg, fields) return logger_warn_fields(l, msg, fields) end
+function error_fields(l, msg, fields) return logger_error_fields(l, msg, fields) end
+function debug_fields(l, msg, fields) return logger_debug_fields(l, msg, fields) end
+function trace_fields(l, msg, fields) return logger_trace_fields(l, msg, fields) end
+function fatal_fields(l, msg, fields) return logger_fatal_fields(l, msg, fields) end
+
+function set_level(l, level) return logger_set_level(l, level) end
+function set_colored(l, colored) return logger_set_colored(l, colored) end
+function set_timestamps(l, timestamps) return logger_set_timestamps(l, timestamps) end
+function set_format(l, format) return logger_set_format(l, format) end
+function set_file(l, path) return logger_set_file(l, path) end
+
+function add_console(l) return logger_add_console(l) end
+function add_file(l, path) return logger_add_file(l, path) end
+function add_rolling_file(l, path, max_size, max_files) return logger_add_rolling_file(l, path, max_size, max_files) end
+function add_field(l, key, value) return logger_add_field(l, key, value) end
+function clear_appenders(l) return logger_clear_appenders(l) end
+function clear_fields(l) return logger_clear_fields(l) end
