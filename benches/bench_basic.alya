@@ -9,7 +9,7 @@ function main()
     bench_start(runner, 2000)
     let i = 0
     while i < 2000
-        let l = log::create("BenchApp", log::LOG_INFO())
+        let l = log::create("BenchApp", log::LogLevel.Info)
         log::logger_set_colored(l, 0)
         log::logger_set_timestamps(l, 1)
         log::logger_add_field(l, "env", "production")
@@ -21,7 +21,7 @@ function main()
     # 2. Text record formatting
     let f1 = log::field("user_id", "42")
     let f2 = log::field("action", "login")
-    let rec_text = log::record(log::LOG_INFO(), "User authenticated successfully", "auth", 1700000000, [f1, f2])
+    let rec_text = log::record(log::LogLevel.Info, "User authenticated successfully", "auth", 1700000000, [f1, f2])
 
     bench_start(runner, 2000)
     let j = 0
@@ -41,11 +41,11 @@ function main()
     bench_stop(runner, "format_record_json with fields (2k runs)")
 
     # 4. Level filtering rejection (fast path)
-    let l_filter = log::create("FilterBench", log::LOG_WARN())
+    let l_filter = log::create("FilterBench", log::LogLevel.Warn)
     bench_start(runner, 2000)
     let m = 0
     while m < 2000
-        log::logger_log(l_filter, log::LOG_DEBUG(), "Should be skipped immediately")
+        log::logger_log(l_filter, log::LogLevel.Debug, "Should be skipped immediately")
         m += 1
     end
     bench_stop(runner, "logger_log filtered level rejection (2k runs)")

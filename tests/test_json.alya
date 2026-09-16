@@ -7,42 +7,42 @@ function main()
     let r = runner_new()
 
     # 1. Basic text formatting without timestamps or target
-    let rec1 = log::record(log::LOG_INFO(), "System ready", "", 1700000000, [])
+    let rec1 = log::record(log::LogLevel.Info, "System ready", "", 1700000000, [])
     let txt1 = log::format_record_text(rec1, 0, 0)
     runner_assert_str_eq(r, txt1, "[INFO]  System ready", "plain text log line matches")
 
     # 2. Text formatting with target
-    let rec2 = log::record(log::LOG_WARN(), "Cache full", "cache-mgr", 1700000000, [])
+    let rec2 = log::record(log::LogLevel.Warn, "Cache full", "cache-mgr", 1700000000, [])
     let txt2 = log::format_record_text(rec2, 0, 0)
     runner_assert_str_eq(r, txt2, "[cache-mgr] [WARN]  Cache full", "text format with target matches")
 
     # 3. Text formatting with structured fields (unquoted and quoted)
     let f1 = log::field("ip", "127.0.0.1")
     let f2 = log::field("user", "Alice Smith")
-    let rec3 = log::record(log::LOG_INFO(), "User authenticated", "auth", 1700000000, [f1, f2])
+    let rec3 = log::record(log::LogLevel.Info, "User authenticated", "auth", 1700000000, [f1, f2])
     let txt3 = log::format_record_text(rec3, 0, 0)
     runner_assert_str_eq(r, txt3, "[auth] [INFO]  User authenticated ip=127.0.0.1 user=\"Alice Smith\"", "text with quoted fields matches")
 
     # 4. JSON formatting without target or fields
-    let jrec1 = log::record(log::LOG_INFO(), "Hello Alya", "", 1700000000, [])
+    let jrec1 = log::record(log::LogLevel.Info, "Hello Alya", "", 1700000000, [])
     let json1 = log::format_record_json(jrec1)
     runner_assert_str_eq(r, json1, "{\"level\":\"INFO\",\"time\":1700000000,\"msg\":\"Hello Alya\"}", "basic JSON matches")
 
     # 5. JSON formatting with target
-    let jrec2 = log::record(log::LOG_DEBUG(), "Query executed", "db", 1700000000, [])
+    let jrec2 = log::record(log::LogLevel.Debug, "Query executed", "db", 1700000000, [])
     let json2 = log::format_record_json(jrec2)
     runner_assert_str_eq(r, json2, "{\"level\":\"DEBUG\",\"time\":1700000000,\"target\":\"db\",\"msg\":\"Query executed\"}", "JSON with target matches")
 
     # 6. JSON formatting with structured fields
     let jf1 = log::field("table", "users")
     let jf2 = log::field("rows", "42")
-    let jrec3 = log::record(log::LOG_DEBUG(), "Query executed", "db", 1700000000, [jf1, jf2])
+    let jrec3 = log::record(log::LogLevel.Debug, "Query executed", "db", 1700000000, [jf1, jf2])
     let json3 = log::format_record_json(jrec3)
     runner_assert_str_eq(r, json3, "{\"level\":\"DEBUG\",\"time\":1700000000,\"target\":\"db\",\"msg\":\"Query executed\",\"fields\":{\"table\":\"users\",\"rows\":\"42\"}}", "JSON with multiple fields matches")
 
     # 7. JSON string escaping (quotes, backslashes, newlines, tabs)
     let esc_fld = log::field("quote", "He said \"hello\"")
-    let esc_rec = log::record(log::LOG_ERROR(), "Line1\nLine2\tTabbed\\Path", "escape-test", 1700000000, [esc_fld])
+    let esc_rec = log::record(log::LogLevel.Error, "Line1\nLine2\tTabbed\\Path", "escape-test", 1700000000, [esc_fld])
     let esc_json = log::format_record_json(esc_rec)
     runner_assert_str_eq(r, esc_json, "{\"level\":\"ERROR\",\"time\":1700000000,\"target\":\"escape-test\",\"msg\":\"Line1\\nLine2\\tTabbed\\\\Path\",\"fields\":{\"quote\":\"He said \\\"hello\\\"\"}}", "JSON string escaping matches")
 

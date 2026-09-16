@@ -1,7 +1,6 @@
 # Types and constants for alya-lang/logger
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
-# Public enumeration for log severity levels (exported via pub)
 pub enum LogLevel
     Trace = 0,
     Debug = 1,
@@ -12,66 +11,16 @@ pub enum LogLevel
     Off = 6
 end
 
-# Public enumeration for log output serialization formats (exported via pub)
 pub enum LogFormat
     Text = 1,
     Json = 2
 end
 
-# Public enumeration for output destination types (exported via pub)
 pub enum AppenderType
     Console = 1,
     File = 2,
     Rolling = 3
 end
-
-# Backward-compatible level variables
-pub let LOG_TRACE = 0
-pub let LOG_DEBUG = 1
-pub let LOG_INFO = 2
-pub let LOG_WARN = 3
-pub let LOG_ERROR = 4
-pub let LOG_FATAL = 5
-pub let LOG_OFF = 6
-
-# Log levels (Functions for cross-module and intra-function access)
-pub function LOG_TRACE() return LogLevel.Trace end
-pub function LOG_DEBUG() return LogLevel.Debug end
-pub function LOG_INFO()  return LogLevel.Info end
-pub function LOG_WARN()  return LogLevel.Warn end
-pub function LOG_ERROR() return LogLevel.Error end
-pub function LOG_FATAL() return LogLevel.Fatal end
-pub function LOG_OFF()   return LogLevel.Off end
-
-pub function level_trace() return LogLevel.Trace end
-pub function level_debug() return LogLevel.Debug end
-pub function level_info()  return LogLevel.Info end
-pub function level_warn()  return LogLevel.Warn end
-pub function level_error() return LogLevel.Error end
-pub function level_fatal() return LogLevel.Fatal end
-pub function level_off()   return LogLevel.Off end
-
-# Output formats
-pub let FORMAT_TEXT = 1
-pub let FORMAT_JSON = 2
-
-pub function FORMAT_TEXT() return LogFormat.Text end
-pub function FORMAT_JSON() return LogFormat.Json end
-pub function format_text_id() return LogFormat.Text end
-pub function format_json_id() return LogFormat.Json end
-
-# Appender types
-pub let APPENDER_CONSOLE = 1
-pub let APPENDER_FILE = 2
-pub let APPENDER_ROLLING = 3
-
-pub function APPENDER_CONSOLE() return AppenderType.Console end
-pub function APPENDER_FILE()    return AppenderType.File end
-pub function APPENDER_ROLLING() return AppenderType.Rolling end
-
-pub function appender_type_console() return AppenderType.Console end
-pub function appender_type_file()    return AppenderType.File end
-pub function appender_type_rolling() return AppenderType.Rolling end
 
 # Key-value field for structured logging
 pub struct LogField

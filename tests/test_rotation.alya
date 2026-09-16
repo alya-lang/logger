@@ -25,7 +25,7 @@ function main()
     cleanup_files(base_log)
 
     # 1. Initialize logger with rolling file appender (max_size = 70 bytes, max_files = 2)
-    let rot_logger = log::create("RotApp", log::LOG_INFO())
+    let rot_logger = log::create("RotApp", log::LogLevel.Info)
     log::logger_set_colored(rot_logger, 0)
     log::logger_add_rolling_file(rot_logger, base_log, 90, 2)
 

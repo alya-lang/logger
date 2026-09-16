@@ -13,19 +13,19 @@ function main()
 
     # 1. Appender struct constructors
     let ap_con = log::appender_console()
-    runner_assert_eq(r, ap_con.app_type, log::APPENDER_CONSOLE(), "console appender type is 1")
+    runner_assert_eq(r, ap_con.app_type, log::AppenderType.Console, "console appender type is 1")
 
     let ap_fil = log::appender_file(test_file)
-    runner_assert_eq(r, ap_fil.app_type, log::APPENDER_FILE(), "file appender type is 2")
+    runner_assert_eq(r, ap_fil.app_type, log::AppenderType.File, "file appender type is 2")
     runner_assert_str_eq(r, ap_fil.app_target, test_file, "file appender target matches")
 
     let ap_rot = log::appender_rolling(test_file, 1024, 3)
-    runner_assert_eq(r, ap_rot.app_type, log::APPENDER_ROLLING(), "rolling appender type is 3")
+    runner_assert_eq(r, ap_rot.app_type, log::AppenderType.Rolling, "rolling appender type is 3")
     runner_assert_eq(r, ap_rot.app_max_size, 1024, "rolling appender max_size is 1024")
     runner_assert_eq(r, ap_rot.app_max_files, 3, "rolling appender max_files is 3")
 
     # 2. File appender writing text logs
-    let file_logger = log::create("FileApp", log::LOG_INFO())
+    let file_logger = log::create("FileApp", log::LogLevel.Info)
     log::logger_set_colored(file_logger, 0)
     log::logger_add_file(file_logger, test_file)
 
@@ -48,8 +48,8 @@ function main()
         remove_file(json_file)
     end
 
-    let json_logger = log::create("JsonApp", log::LOG_INFO())
-    log::logger_set_format(json_logger, log::FORMAT_JSON())
+    let json_logger = log::create("JsonApp", log::LogLevel.Info)
+    log::logger_set_format(json_logger, log::LogFormat.Json)
     log::logger_add_file(json_logger, json_file)
 
     log::logger_info(json_logger, "JSON event message")

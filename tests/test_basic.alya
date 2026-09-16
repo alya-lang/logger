@@ -7,18 +7,18 @@ function main()
     let r = runner_new()
 
     # 1. Logger creation
-    let l = log::create("TestApp", log::LOG_INFO())
+    let l = log::create("TestApp", log::LogLevel.Info)
     runner_assert_str_eq(r, l.log_name, "TestApp", "logger name is TestApp")
-    runner_assert_eq(r, l.log_level, log::LOG_INFO(), "default level is LOG_INFO")
+    runner_assert_eq(r, l.log_level, log::LogLevel.Info, "default level is LOG_INFO")
     runner_assert_eq(r, l.log_colored, 1, "colored is enabled by default")
     runner_assert_eq(r, l.log_timestamps, 0, "timestamps are disabled by default")
-    runner_assert_eq(r, l.log_format, log::FORMAT_TEXT(), "default format is FORMAT_TEXT")
+    runner_assert_eq(r, l.log_format, log::LogFormat.Text, "default format is FORMAT_TEXT")
     runner_assert_eq(r, len(l.log_appenders), 0, "default appenders list is empty")
     runner_assert_eq(r, len(l.log_fields), 0, "default fields list is empty")
 
     # 2. Configuration setters
-    log::logger_set_level(l, log::LOG_DEBUG())
-    runner_assert_eq(r, l.log_level, log::LOG_DEBUG(), "set_level updates to LOG_DEBUG")
+    log::logger_set_level(l, log::LogLevel.Debug)
+    runner_assert_eq(r, l.log_level, log::LogLevel.Debug, "set_level updates to LOG_DEBUG")
 
     log::logger_set_colored(l, 0)
     runner_assert_eq(r, l.log_colored, 0, "set_colored updates to 0")
@@ -26,8 +26,8 @@ function main()
     log::logger_set_timestamps(l, 1)
     runner_assert_eq(r, l.log_timestamps, 1, "set_timestamps updates to 1")
 
-    log::logger_set_format(l, log::FORMAT_JSON())
-    runner_assert_eq(r, l.log_format, log::FORMAT_JSON(), "set_format updates to FORMAT_JSON")
+    log::logger_set_format(l, log::LogFormat.Json)
+    runner_assert_eq(r, l.log_format, log::LogFormat.Json, "set_format updates to FORMAT_JSON")
 
     log::logger_set_file(l, "temp_test.log")
     runner_assert_str_eq(r, l.log_file, "temp_test.log", "set_file updates log_file path")
@@ -49,25 +49,25 @@ function main()
     runner_assert_str_eq(r, custom_fld.fld_value, "42", "field helper sets value")
 
     # 5. Record constructor
-    let rec = log::record(log::LOG_WARN(), "Disk space low", "storage", 1700000000, [custom_fld])
-    runner_assert_eq(r, rec.rec_level, log::LOG_WARN(), "record level is LOG_WARN")
+    let rec = log::record(log::LogLevel.Warn, "Disk space low", "storage", 1700000000, [custom_fld])
+    runner_assert_eq(r, rec.rec_level, log::LogLevel.Warn, "record level is LOG_WARN")
     runner_assert_str_eq(r, rec.rec_msg, "Disk space low", "record msg matches")
     runner_assert_str_eq(r, rec.rec_target, "storage", "record target matches")
     runner_assert_eq(r, rec.rec_time, 1700000000, "record timestamp matches")
     runner_assert_eq(r, len(rec.rec_fields), 1, "record fields count is 1")
 
     # 6. Level filtering logic
-    let filter_logger = log::create("FilterTest", log::LOG_WARN())
-    runner_assert_eq(r, log::logger_log(filter_logger, log::LOG_DEBUG(), "Ignored"), 0, "DEBUG ignored when level is WARN")
-    runner_assert_eq(r, log::logger_log(filter_logger, log::LOG_INFO(), "Ignored"), 0, "INFO ignored when level is WARN")
+    let filter_logger = log::create("FilterTest", log::LogLevel.Warn)
+    runner_assert_eq(r, log::logger_log(filter_logger, log::LogLevel.Debug, "Ignored"), 0, "DEBUG ignored when level is WARN")
+    runner_assert_eq(r, log::logger_log(filter_logger, log::LogLevel.Info, "Ignored"), 0, "INFO ignored when level is WARN")
 
-    let off_logger = log::create("OffTest", log::LOG_OFF())
-    runner_assert_eq(r, log::logger_log(off_logger, log::LOG_FATAL(), "Ignored"), 0, "FATAL ignored when level is OFF")
+    let off_logger = log::create("OffTest", log::LogLevel.Off)
+    runner_assert_eq(r, log::logger_log(off_logger, log::LogLevel.Fatal, "Ignored"), 0, "FATAL ignored when level is OFF")
 
     # 7. Struct methods
-    let method_logger = log::create("MethodTest", log::LOG_INFO())
-    method_logger.set_level(log::LOG_DEBUG())
-    runner_assert_eq(r, method_logger.log_level, log::LOG_DEBUG(), "method_logger.set_level works")
+    let method_logger = log::create("MethodTest", log::LogLevel.Info)
+    method_logger.set_level(log::LogLevel.Debug)
+    runner_assert_eq(r, method_logger.log_level, log::LogLevel.Debug, "method_logger.set_level works")
     method_logger.add_field("subsystem", "cache")
     runner_assert_eq(r, len(method_logger.log_fields), 1, "method_logger.add_field works")
     let ret_log = method_logger.info("Test message via struct method")

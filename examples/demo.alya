@@ -8,7 +8,7 @@ function main()
 
     # 1. Leveled Console Logging
     say "\n--- 1. Leveled Console Logging ---"
-    let console_log = log::create("Init", log::LOG_TRACE())
+    let console_log = log::create("Init", log::LogLevel.Trace)
     log::trace(console_log, "Entering application initialization phase")
     log::debug(console_log, "Configuration file loaded from /etc/app.json")
     log::info(console_log, "HTTP server initialized on 0.0.0.0:8080")
@@ -18,7 +18,7 @@ function main()
 
     # 2. Structured Component Logger with Timestamps
     say "\n--- 2. Structured Component Logger with Timestamps ---"
-    let app_log = log::create("ApiGateway", log::LOG_DEBUG())
+    let app_log = log::create("ApiGateway", log::LogLevel.Debug)
     log::set_timestamps(app_log, 1)
 
     log::debug(app_log, "Incoming request: GET /api/v1/users")
@@ -27,7 +27,7 @@ function main()
 
     # 3. Structured Key-Value Fields (Text Format)
     say "\n--- 3. Structured Fields (Text Format) ---"
-    let auth_log = log::create("AuthService", log::LOG_INFO())
+    let auth_log = log::create("AuthService", log::LogLevel.Info)
     log::set_timestamps(auth_log, 1)
     log::add_field(auth_log, "env", "production")
 
@@ -40,8 +40,8 @@ function main()
 
     # 4. JSON Format Output
     say "\n--- 4. JSON Formatted Output ---"
-    let json_log = log::create("Metrics", log::LOG_INFO())
-    log::set_format(json_log, log::FORMAT_JSON())
+    let json_log = log::create("Metrics", log::LogLevel.Info)
+    log::set_format(json_log, log::LogFormat.Json)
 
     let metrics_fields = [
         log::field("cpu_usage", "24.5%"),
@@ -60,7 +60,7 @@ function main()
         remove_file(demo_log + ".1")
     end
 
-    let file_log = log::create("RollingDemo", log::LOG_INFO())
+    let file_log = log::create("RollingDemo", log::LogLevel.Info)
     log::set_colored(file_log, 0)
     log::add_console(file_log)
     log::add_rolling_file(file_log, demo_log, 150, 3)
