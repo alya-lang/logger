@@ -202,7 +202,7 @@ main()
 | `logger_set_colored(l, colored)` | `l: Logger, colored: 0 \| 1` | Enables/disables ANSI colors |
 | `logger_set_timestamps(l, enabled)` | `l: Logger, enabled: 0 \| 1` | Enables/disables `[HH:MM:SS]` timestamps |
 | `logger_set_format(l, format)` | `l: Logger, format: 1 \| 2` | Sets text (`1`) or JSON (`2`) formatting |
-| `logger_set_file(l, path)` | `l: Logger, path: string` | Sets legacy fallback destination file |
+| `logger_set_file(l, path)` | `l: Logger, path: string` | Sets destination file path |
 | `logger_add_console(l)` | `l: Logger` | Registers stdout console appender |
 | `logger_add_file(l, path)` | `l: Logger, path: string` | Registers static file appender |
 | `logger_add_rolling_file(l, path, max_bytes, max_files)` | `l: Logger, ...` | Registers size-based rolling appender |
