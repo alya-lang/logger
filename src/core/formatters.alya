@@ -6,7 +6,7 @@ import "./utils.alya"
 import "./levels.alya"
 
 # Formats record into human-readable text line
-function format_text(rec, colored, timestamps)
+pub function format_text(rec, colored, timestamps)
     let prefix = ""
     if timestamps == 1
         let ts_str = format_time_hms(rec.rec_time)
@@ -16,7 +16,7 @@ function format_text(rec, colored, timestamps)
     let target_str = str_from_ptr(rec.rec_target)
     if len(target_str) > 0
         if colored == 1
-            prefix = prefix + _ansi_esc("35", "[" + target_str + "]") + " "
+            prefix = prefix + "\e[35m[" + target_str + "]\e[0m "
         else
             prefix = prefix + "[" + target_str + "] "
         end
@@ -27,11 +27,8 @@ function format_text(rec, colored, timestamps)
     let res = prefix + badge + " " + msg
 
     let flds = rec.rec_fields
-    let flen = len(flds)
-    if flen > 0
-        let i = 0
-        while i < flen
-            let f = flds[i]
+    if len(flds) > 0
+        for f in flds
             let k = str_from_ptr(f.fld_key)
             let v = str_from_ptr(f.fld_value)
             if has_space(v) == 1
@@ -39,14 +36,13 @@ function format_text(rec, colored, timestamps)
             else
                 res = res + " " + k + "=" + v
             end
-            i += 1
         end
     end
     return res
 end
 
 # Formats record into a compact JSON string
-function format_json(rec)
+pub function format_json(rec)
     let lvl = level_to_str(rec.rec_level)
     let msg = json_escape_str(rec.rec_msg)
     let target = json_escape_str(rec.rec_target)
@@ -62,16 +58,13 @@ function format_json(rec)
     let flen = len(flds)
     if flen > 0
         out = out + ",\"fields\":{"
-        let i = 0
-        while i < flen
-            let f = flds[i]
+        for i, f in flds
             let k = json_escape_str(f.fld_key)
             let v = json_escape_str(f.fld_value)
             if i > 0
                 out = out + ","
             end
             out = out + "\"" + k + "\":\"" + v + "\""
-            i += 1
         end
         out = out + "}"
     end

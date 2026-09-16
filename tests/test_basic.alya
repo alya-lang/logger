@@ -64,6 +64,17 @@ function main()
     let off_logger = log::create("OffTest", log::LOG_OFF())
     runner_assert_eq(r, log::logger_log(off_logger, log::LOG_FATAL(), "Ignored"), 0, "FATAL ignored when level is OFF")
 
+    # 7. Struct methods
+    let method_logger = log::create("MethodTest", log::LOG_INFO())
+    method_logger.set_level(log::LOG_DEBUG())
+    runner_assert_eq(r, method_logger.log_level, log::LOG_DEBUG(), "method_logger.set_level works")
+    method_logger.add_field("subsystem", "cache")
+    runner_assert_eq(r, len(method_logger.log_fields), 1, "method_logger.add_field works")
+    let ret_log = method_logger.info("Test message via struct method")
+    runner_assert_eq(r, ret_log, 1, "method_logger.info works")
+    let ret_dbg = method_logger.debug("Debug message via struct method")
+    runner_assert_eq(r, ret_dbg, 1, "method_logger.debug works")
+
     let failed = runner_summary(r)
     if failed > 0
         exit(1)

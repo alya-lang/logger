@@ -8,20 +8,18 @@ import "./formatters.alya"
 import "./appenders.alya"
 
 # Dispatches formatted message across configured appenders
-function logger_dispatch(l, formatted)
+pub function logger_dispatch(l, formatted)
     let num_apps = len(l.log_appenders)
     if num_apps > 0
-        let i = 0
-        while i < num_apps
-            let app = l.log_appenders[i]
-            if app.app_type == 1
-                append_console(formatted)
-            elif app.app_type == 2
-                append_to_file(app.app_target, formatted)
-            elif app.app_type == 3
-                append_to_rolling_file(app.app_target, formatted, app.app_max_size, app.app_max_files)
+        for app in l.log_appenders
+            when app.app_type
+                is AppenderType.Console then
+                    append_console(formatted)
+                is AppenderType.File then
+                    append_to_file(app.app_target, formatted)
+                is AppenderType.Rolling then
+                    append_to_rolling_file(app.app_target, formatted, app.app_max_size, app.app_max_files)
             end
-            i += 1
         end
     else
         # Default behavior: Console output + optional log_file
@@ -34,17 +32,18 @@ function logger_dispatch(l, formatted)
 end
 
 # Primary logging function
-function logger_log(l, level, message)
-    if level < l.log_level or l.log_level == 6
+pub function logger_log(l, level, message)
+    if level < l.log_level or l.log_level == LogLevel.Off
         return 0
     end
 
     let rec = record_new(level, message, l.log_name, time(), l.log_fields)
     let formatted = ""
-    if l.log_format == 2
-        formatted = format_json(rec)
-    else
-        formatted = format_text(rec, l.log_colored, l.log_timestamps)
+    when l.log_format
+        is LogFormat.Json then
+            formatted = format_json(rec)
+        else
+            formatted = format_text(rec, l.log_colored, l.log_timestamps)
     end
 
     logger_dispatch(l, formatted)
@@ -52,29 +51,26 @@ function logger_log(l, level, message)
 end
 
 # Logs with extra call-site structured fields
-function logger_log_with_fields(l, level, message, extra_fields)
-    if level < l.log_level or l.log_level == 6
+pub function logger_log_with_fields(l, level, message, extra_fields)
+    if level < l.log_level or l.log_level == LogLevel.Off
         return 0
     end
 
     let all_fields = []
-    let i = 0
-    while i < len(l.log_fields)
-        all_fields.push(l.log_fields[i])
-        i += 1
+    for f in l.log_fields
+        all_fields.push(f)
     end
-    let j = 0
-    while j < len(extra_fields)
-        all_fields.push(extra_fields[j])
-        j += 1
+    for f in extra_fields
+        all_fields.push(f)
     end
 
     let rec = record_new(level, message, l.log_name, time(), all_fields)
     let formatted = ""
-    if l.log_format == 2
-        formatted = format_json(rec)
-    else
-        formatted = format_text(rec, l.log_colored, l.log_timestamps)
+    when l.log_format
+        is LogFormat.Json then
+            formatted = format_json(rec)
+        else
+            formatted = format_text(rec, l.log_colored, l.log_timestamps)
     end
 
     logger_dispatch(l, formatted)
@@ -82,62 +78,160 @@ function logger_log_with_fields(l, level, message, extra_fields)
 end
 
 # Configuration / fluent setters
-function logger_set_level(l, level)
+pub function logger_set_level(l, level)
     l.log_level = level
 end
 
-function logger_set_colored(l, colored)
+pub function logger_set_colored(l, colored)
     l.log_colored = colored
 end
 
-function logger_set_timestamps(l, timestamps)
+pub function logger_set_timestamps(l, timestamps)
     l.log_timestamps = timestamps
 end
 
-function logger_set_file(l, file_path)
+pub function logger_set_file(l, file_path)
     l.log_file = str_from_ptr(file_path)
 end
 
-function logger_set_format(l, format)
+pub function logger_set_format(l, format)
     l.log_format = format
 end
 
-function logger_add_console(l)
+pub function logger_add_console(l)
     l.log_appenders.push(appender_console())
 end
 
-function logger_add_file(l, path)
+pub function logger_add_file(l, path)
     l.log_appenders.push(appender_file(path))
 end
 
-function logger_add_rolling_file(l, path, max_size, max_files)
+pub function logger_add_rolling_file(l, path, max_size, max_files)
     l.log_appenders.push(appender_rolling(path, max_size, max_files))
 end
 
-function logger_add_field(l, key, value)
+pub function logger_add_field(l, key, value)
     l.log_fields.push(field_new(key, value))
 end
 
-function logger_clear_appenders(l)
+pub function logger_clear_appenders(l)
     l.log_appenders = []
 end
 
-function logger_clear_fields(l)
+pub function logger_clear_fields(l)
     l.log_fields = []
 end
 
 # Leveled convenience logging methods
-function logger_trace(l, msg) return logger_log(l, 0, msg) end
-function logger_debug(l, msg) return logger_log(l, 1, msg) end
-function logger_info(l, msg)  return logger_log(l, 2, msg) end
-function logger_warn(l, msg)  return logger_log(l, 3, msg) end
-function logger_error(l, msg) return logger_log(l, 4, msg) end
-function logger_fatal(l, msg) return logger_log(l, 5, msg) end
+pub function logger_trace(l, msg) return logger_log(l, LogLevel.Trace, msg) end
+pub function logger_debug(l, msg) return logger_log(l, LogLevel.Debug, msg) end
+pub function logger_info(l, msg)  return logger_log(l, LogLevel.Info, msg) end
+pub function logger_warn(l, msg)  return logger_log(l, LogLevel.Warn, msg) end
+pub function logger_error(l, msg) return logger_log(l, LogLevel.Error, msg) end
+pub function logger_fatal(l, msg) return logger_log(l, LogLevel.Fatal, msg) end
 
 # Leveled logging with call-site fields
-function logger_trace_fields(l, msg, fields) return logger_log_with_fields(l, 0, msg, fields) end
-function logger_debug_fields(l, msg, fields) return logger_log_with_fields(l, 1, msg, fields) end
-function logger_info_fields(l, msg, fields)  return logger_log_with_fields(l, 2, msg, fields) end
-function logger_warn_fields(l, msg, fields)  return logger_log_with_fields(l, 3, msg, fields) end
-function logger_error_fields(l, msg, fields) return logger_log_with_fields(l, 4, msg, fields) end
-function logger_fatal_fields(l, msg, fields) return logger_log_with_fields(l, 5, msg, fields) end
+pub function logger_trace_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Trace, msg, fields) end
+pub function logger_debug_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Debug, msg, fields) end
+pub function logger_info_fields(l, msg, fields)  return logger_log_with_fields(l, LogLevel.Info, msg, fields) end
+pub function logger_warn_fields(l, msg, fields)  return logger_log_with_fields(l, LogLevel.Warn, msg, fields) end
+pub function logger_error_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Error, msg, fields) end
+pub function logger_fatal_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Fatal, msg, fields) end
+
+# --- Idiomatic Struct Methods on AppLogger ---
+
+pub function AppLogger.log(self, level, message)
+    return logger_log(self, level, message)
+end
+
+pub function AppLogger.trace(self, msg)
+    return logger_trace(self, msg)
+end
+
+pub function AppLogger.debug(self, msg)
+    return logger_debug(self, msg)
+end
+
+pub function AppLogger.info(self, msg)
+    return logger_info(self, msg)
+end
+
+pub function AppLogger.warn(self, msg)
+    return logger_warn(self, msg)
+end
+
+pub function AppLogger.error(self, msg)
+    return logger_error(self, msg)
+end
+
+pub function AppLogger.fatal(self, msg)
+    return logger_fatal(self, msg)
+end
+
+pub function AppLogger.trace_fields(self, msg, fields)
+    return logger_trace_fields(self, msg, fields)
+end
+
+pub function AppLogger.debug_fields(self, msg, fields)
+    return logger_debug_fields(self, msg, fields)
+end
+
+pub function AppLogger.info_fields(self, msg, fields)
+    return logger_info_fields(self, msg, fields)
+end
+
+pub function AppLogger.warn_fields(self, msg, fields)
+    return logger_warn_fields(self, msg, fields)
+end
+
+pub function AppLogger.error_fields(self, msg, fields)
+    return logger_error_fields(self, msg, fields)
+end
+
+pub function AppLogger.fatal_fields(self, msg, fields)
+    return logger_fatal_fields(self, msg, fields)
+end
+
+pub function AppLogger.set_level(self, level)
+    logger_set_level(self, level)
+end
+
+pub function AppLogger.set_colored(self, colored)
+    logger_set_colored(self, colored)
+end
+
+pub function AppLogger.set_timestamps(self, timestamps)
+    logger_set_timestamps(self, timestamps)
+end
+
+pub function AppLogger.set_file(self, file_path)
+    logger_set_file(self, file_path)
+end
+
+pub function AppLogger.set_format(self, format)
+    logger_set_format(self, format)
+end
+
+pub function AppLogger.add_console(self)
+    logger_add_console(self)
+end
+
+pub function AppLogger.add_file(self, path)
+    logger_add_file(self, path)
+end
+
+pub function AppLogger.add_rolling_file(self, path, max_size, max_files)
+    logger_add_rolling_file(self, path, max_size, max_files)
+end
+
+pub function AppLogger.add_field(self, key, value)
+    logger_add_field(self, key, value)
+end
+
+pub function AppLogger.clear_appenders(self)
+    logger_clear_appenders(self)
+end
+
+pub function AppLogger.clear_fields(self)
+    logger_clear_fields(self)
+end

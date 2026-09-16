@@ -5,19 +5,19 @@ import "../types.alya"
 import "./utils.alya"
 
 # Outputs line to console stdout
-function append_console(line)
+pub function append_console(line)
     say line
 end
 
 # Appends line to a target file (strips ANSI color codes)
-function append_to_file(path, line)
+pub function append_to_file(path, line)
     let clean = ansi_strip(line)
     append_file(path, clean + "\n")
 end
 
 # Rotates log file if it exceeds max_size bytes
 # Backups are named path.1, path.2, ... path.<max_files>
-function rotate_log_file(path, max_files)
+pub function rotate_log_file(path, max_files)
     if max_files <= 0
         remove_file(path)
         return 1
@@ -47,7 +47,7 @@ function rotate_log_file(path, max_files)
 end
 
 # Appends line to rolling file, rotating if needed
-function append_to_rolling_file(path, line, max_size, max_files)
+pub function append_to_rolling_file(path, line, max_size, max_files)
     let clean = ansi_strip(line)
     let content = clean + "\n"
     let line_len = len(content)

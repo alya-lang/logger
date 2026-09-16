@@ -1,109 +1,133 @@
 # Types and constants for alya-lang/logger
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
-# Log levels (Variables for top-level script access)
-let LOG_TRACE = 0
-let LOG_DEBUG = 1
-let LOG_INFO = 2
-let LOG_WARN = 3
-let LOG_ERROR = 4
-let LOG_FATAL = 5
-let LOG_OFF = 6
+# Public enumeration for log severity levels (exported via pub)
+pub enum LogLevel
+    Trace = 0,
+    Debug = 1,
+    Info = 2,
+    Warn = 3,
+    Error = 4,
+    Fatal = 5,
+    Off = 6
+end
+
+# Public enumeration for log output serialization formats (exported via pub)
+pub enum LogFormat
+    Text = 1,
+    Json = 2
+end
+
+# Public enumeration for output destination types (exported via pub)
+pub enum AppenderType
+    Console = 1,
+    File = 2,
+    Rolling = 3
+end
+
+# Backward-compatible level variables
+pub let LOG_TRACE = 0
+pub let LOG_DEBUG = 1
+pub let LOG_INFO = 2
+pub let LOG_WARN = 3
+pub let LOG_ERROR = 4
+pub let LOG_FATAL = 5
+pub let LOG_OFF = 6
 
 # Log levels (Functions for cross-module and intra-function access)
-function LOG_TRACE() return 0 end
-function LOG_DEBUG() return 1 end
-function LOG_INFO()  return 2 end
-function LOG_WARN()  return 3 end
-function LOG_ERROR() return 4 end
-function LOG_FATAL() return 5 end
-function LOG_OFF()   return 6 end
+pub function LOG_TRACE() return LogLevel.Trace end
+pub function LOG_DEBUG() return LogLevel.Debug end
+pub function LOG_INFO()  return LogLevel.Info end
+pub function LOG_WARN()  return LogLevel.Warn end
+pub function LOG_ERROR() return LogLevel.Error end
+pub function LOG_FATAL() return LogLevel.Fatal end
+pub function LOG_OFF()   return LogLevel.Off end
 
-function level_trace() return 0 end
-function level_debug() return 1 end
-function level_info()  return 2 end
-function level_warn()  return 3 end
-function level_error() return 4 end
-function level_fatal() return 5 end
-function level_off()   return 6 end
+pub function level_trace() return LogLevel.Trace end
+pub function level_debug() return LogLevel.Debug end
+pub function level_info()  return LogLevel.Info end
+pub function level_warn()  return LogLevel.Warn end
+pub function level_error() return LogLevel.Error end
+pub function level_fatal() return LogLevel.Fatal end
+pub function level_off()   return LogLevel.Off end
 
 # Output formats
-let FORMAT_TEXT = 1
-let FORMAT_JSON = 2
+pub let FORMAT_TEXT = 1
+pub let FORMAT_JSON = 2
 
-function FORMAT_TEXT() return 1 end
-function FORMAT_JSON() return 2 end
-function format_text_id() return 1 end
-function format_json_id() return 2 end
+pub function FORMAT_TEXT() return LogFormat.Text end
+pub function FORMAT_JSON() return LogFormat.Json end
+pub function format_text_id() return LogFormat.Text end
+pub function format_json_id() return LogFormat.Json end
 
 # Appender types
-let APPENDER_CONSOLE = 1
-let APPENDER_FILE = 2
-let APPENDER_ROLLING = 3
+pub let APPENDER_CONSOLE = 1
+pub let APPENDER_FILE = 2
+pub let APPENDER_ROLLING = 3
 
-function APPENDER_CONSOLE() return 1 end
-function APPENDER_FILE()    return 2 end
-function APPENDER_ROLLING() return 3 end
+pub function APPENDER_CONSOLE() return AppenderType.Console end
+pub function APPENDER_FILE()    return AppenderType.File end
+pub function APPENDER_ROLLING() return AppenderType.Rolling end
 
-function appender_type_console() return 1 end
-function appender_type_file()    return 2 end
-function appender_type_rolling() return 3 end
+pub function appender_type_console() return AppenderType.Console end
+pub function appender_type_file()    return AppenderType.File end
+pub function appender_type_rolling() return AppenderType.Rolling end
 
 # Key-value field for structured logging
-struct LogField
-    fld_key
+pub struct LogField
+    fld_key,
     fld_value
 end
 
-function field_new(key, value)
+pub function field_new(key, value)
     return LogField(str_from_ptr(key), str_from_ptr(value))
 end
 
 # A single log record event
-struct LogRecord
-    rec_level
-    rec_msg
-    rec_target
-    rec_time
+pub struct LogRecord
+    rec_level,
+    rec_msg,
+    rec_target,
+    rec_time,
     rec_fields
 end
 
-function record_new(level, msg, target, timestamp, fields)
+pub function record_new(level, msg, target, timestamp, fields)
     return LogRecord(level, str_from_ptr(msg), str_from_ptr(target), timestamp, fields)
 end
 
 # An output destination (console, file, or rolling file)
-struct Appender
-    app_type
-    app_target
-    app_max_size
+pub struct Appender
+    app_type,
+    app_target,
+    app_max_size,
     app_max_files
 end
 
-function appender_console()
-    return Appender(1, "", 0, 0)
+pub function appender_console()
+    return Appender(AppenderType.Console, "", 0, 0)
 end
 
-function appender_file(path)
-    return Appender(2, str_from_ptr(path), 0, 0)
+pub function appender_file(path)
+    return Appender(AppenderType.File, str_from_ptr(path), 0, 0)
 end
 
-function appender_rolling(path, max_size_bytes, max_files)
-    return Appender(3, str_from_ptr(path), max_size_bytes, max_files)
+pub function appender_rolling(path, max_size_bytes, max_files)
+    return Appender(AppenderType.Rolling, str_from_ptr(path), max_size_bytes, max_files)
 end
 
 # Main Logger struct
-struct AppLogger
-    log_name
-    log_level
-    log_colored
-    log_timestamps
-    log_file
-    log_format
-    log_appenders
+pub struct AppLogger
+    log_name,
+    log_level,
+    log_colored,
+    log_timestamps,
+    log_file,
+    log_format,
+    log_appenders,
     log_fields
 end
 
-function logger_new(name = "", level = 2)
-    return AppLogger(str_from_ptr(name), level, 1, 0, "", 1, [], [])
+pub function logger_new(name = "", level = 2)
+    return AppLogger(str_from_ptr(name), level, 1, 0, "", LogFormat.Text, [], [])
 end
