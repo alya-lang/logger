@@ -147,13 +147,11 @@ main()
 {"level":"INFO","time":1789157665,"target":"Telemetry","msg":"HTTP transaction completed","fields":{"latency_ms":"28","status":"200"}}
 ```
 
----
-
-## 🔄 Appenders & Log Rotation
+### 5. Appenders & Log Rotation
 
 A single logger can write to multiple output streams simultaneously.
 
-### Multi-Appender Setup
+#### Multi-Appender Setup
 
 ```alya
 import "logger" as log
@@ -169,7 +167,7 @@ end
 main()
 ```
 
-### Rolling File Appender
+#### Rolling File Appender
 
 Automatically archives old logs once the file size reaches a specified byte threshold:
 
@@ -238,24 +236,36 @@ main()
 
 ---
 
-## 🧪 Running Tests & Benchmarks
+## 🧪 Running Tests, Benchmarks & Documentation
 
-Run the complete test suite:
+Run the automated test suite using `alya test`:
 
 ```bash
 alya test
 ```
 
-Run micro-benchmarks:
+Generate static API documentation:
+
+```bash
+alya doc . -o docs --markdown
+```
+
+Run the benchmark suite:
 
 ```bash
 alya run benches/bench_basic.alya
 ```
 
-Run feature demonstration:
+Run the example demo:
 
 ```bash
 alya run examples/demo.alya
+```
+
+Check code formatting:
+
+```bash
+alya fmt . --check
 ```
 
 ---
