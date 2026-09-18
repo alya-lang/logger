@@ -60,8 +60,8 @@ logger = { git = "https://github.com/alya-lang/logger", branch = "main" }
 Or install it directly via the Alya CLI:
 
 ```bash
-alyac add logger --git https://github.com/alya-lang/logger --branch main
-alyac install
+alya add logger --git https://github.com/alya-lang/logger --branch main
+alya install
 ```
 
 ---
@@ -243,19 +243,19 @@ main()
 Run the complete test suite:
 
 ```bash
-alyac test
+alya test
 ```
 
 Run micro-benchmarks:
 
 ```bash
-alyac run benches/bench_basic.alya
+alya run benches/bench_basic.alya
 ```
 
 Run feature demonstration:
 
 ```bash
-alyac run examples/demo.alya
+alya run examples/demo.alya
 ```
 
 ---
@@ -267,12 +267,12 @@ Contributions are welcome! Please follow these steps:
 1. Fork the repository and clone it locally
 2. Install dependencies:
    ```bash
-   alyac install
+   alya install
    ```
 3. Create your feature branch (`git checkout -b feature/my-feature`)
 4. Verify tests and formatting before opening a PR:
    ```bash
-   alyac test
+   alya test
    ```
 5. Commit your changes (`git commit -m "feat: add feature"`) and open a Pull Request
 
