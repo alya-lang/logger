@@ -1,6 +1,7 @@
 # Types and constants for alya-lang/logger
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
+## Public enumeration of supported log levels.
 pub enum LogLevel
     Trace = 0,
     Debug = 1,
@@ -11,28 +12,31 @@ pub enum LogLevel
     Off = 6
 end
 
+## Public enumeration of supported log output formatting modes.
 pub enum LogFormat
     Text = 1,
     Json = 2
 end
 
+## Public enumeration of appender destination types.
 pub enum AppenderType
     Console = 1,
     File = 2,
     Rolling = 3
 end
 
-# Key-value field for structured logging
+## Key-value field structure for structured contextual logging.
 pub struct LogField
     fld_key,
     fld_value
 end
 
+## Factory function to create a new LogField key-value pair.
 pub function field_new(key, value)
     return LogField(str_from_ptr(key), str_from_ptr(value))
 end
 
-# A single log record event
+## A single log record event representing an emitted message with metadata.
 pub struct LogRecord
     rec_level,
     rec_msg,
@@ -41,11 +45,12 @@ pub struct LogRecord
     rec_fields
 end
 
+## Factory function to construct a new LogRecord.
 pub function record_new(level, msg, target, timestamp, fields)
     return LogRecord(level, str_from_ptr(msg), str_from_ptr(target), timestamp, fields)
 end
 
-# An output destination (console, file, or rolling file)
+## An output destination definition (console, file, or rolling file).
 pub struct Appender
     app_type,
     app_target,
@@ -53,19 +58,22 @@ pub struct Appender
     app_max_files
 end
 
+## Factory function to create a standard Console appender.
 pub function appender_console()
     return Appender(AppenderType.Console, "", 0, 0)
 end
 
+## Factory function to create a static File appender.
 pub function appender_file(path)
     return Appender(AppenderType.File, str_from_ptr(path), 0, 0)
 end
 
+## Factory function to create a Rolling File appender with size limit and backup retention.
 pub function appender_rolling(path, max_size_bytes, max_files)
     return Appender(AppenderType.Rolling, str_from_ptr(path), max_size_bytes, max_files)
 end
 
-# Main Logger struct
+## Main Logger configuration and state container struct.
 pub struct AppLogger
     log_name,
     log_level,
@@ -77,6 +85,7 @@ pub struct AppLogger
     log_fields
 end
 
+## Factory constructor to initialize an AppLogger instance.
 pub function logger_new(name = "", level = 2)
     return AppLogger(str_from_ptr(name), level, 1, 0, "", LogFormat.Text, [], [])
 end

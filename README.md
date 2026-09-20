@@ -88,11 +88,11 @@ main()
 import "logger" as log
 
 function main()
-    let app_log = log::create("ApiGateway", log::LOG_INFO())
-    log::logger_set_timestamps(app_log, 1)
+    let app_log = log::create("ApiGateway", log::LogLevel.Info)
+    app_log.set_timestamps(1)
 
-    log::logger_info(app_log, "Server listening on 0.0.0.0:8080")
-    log::logger_debug(app_log, "This debug trace is skipped at INFO level")
+    app_log.info("Server listening on 0.0.0.0:8080")
+    app_log.debug("This debug trace is skipped at INFO level")
 end
 
 main()
@@ -104,15 +104,15 @@ main()
 import "logger" as log
 
 function main()
-    let auth_log = log::create("AuthService", log::LOG_INFO())
-    log::logger_set_timestamps(auth_log, 1)
-    log::logger_add_field(auth_log, "env", "production")
+    let auth_log = log::create("AuthService", log::LogLevel.Info)
+    auth_log.set_timestamps(1)
+    auth_log.add_field("env", "production")
 
     let call_fields = [
         log::field("user_id", "4092"),
         log::field("ip", "10.0.4.15")
     ]
-    log::logger_info_fields(auth_log, "User session authenticated", call_fields)
+    auth_log.info_fields("User session authenticated", call_fields)
 end
 
 main()
@@ -129,14 +129,14 @@ main()
 import "logger" as log
 
 function main()
-    let json_log = log::create("Telemetry", log::LOG_INFO())
-    log::logger_set_format(json_log, log::FORMAT_JSON())
+    let json_log = log::create("Telemetry", log::LogLevel.Info)
+    json_log.set_format(log::LogFormat.Json)
 
     let event_fields = [
         log::field("latency_ms", "28"),
         log::field("status", "200")
     ]
-    log::logger_info_fields(json_log, "HTTP transaction completed", event_fields)
+    json_log.info_fields("HTTP transaction completed", event_fields)
 end
 
 main()
@@ -157,11 +157,11 @@ A single logger can write to multiple output streams simultaneously.
 import "logger" as log
 
 function main()
-    let multi_log = log::create("App", log::LOG_INFO())
-    log::logger_add_console(multi_log)
-    log::logger_add_file(multi_log, "logs/app.log")
+    let multi_log = log::create("App", log::LogLevel.Info)
+    multi_log.add_console()
+    multi_log.add_file("logs/app.log")
 
-    log::logger_info(multi_log, "Written to both console and static log file")
+    multi_log.info("Written to both console and static log file")
 end
 
 main()
@@ -175,12 +175,12 @@ Automatically archives old logs once the file size reaches a specified byte thre
 import "logger" as log
 
 function main()
-    let rot_log = log::create("App", log::LOG_INFO())
+    let rot_log = log::create("App", log::LogLevel.Info)
     
     # Rotate at 10 MB (10485760 bytes), keep 5 backups (app.log.1 ... app.log.5)
-    log::logger_add_rolling_file(rot_log, "logs/app.log", 10485760, 5)
+    rot_log.add_rolling_file("logs/app.log", 10485760, 5)
 
-    log::logger_info(rot_log, "Service transaction record")
+    rot_log.info("Service transaction record")
 end
 
 main()
@@ -189,6 +189,18 @@ main()
 ---
 
 ## 📖 API Reference
+
+### Enums & Types
+
+| Symbol | Type | Description |
+|---|---|---|
+| `LogLevel` | `enum` | Leveled logging hierarchy (`Trace`, `Debug`, `Info`, `Warn`, `Error`, `Fatal`, `Off`). |
+| `LogFormat` | `enum` | Formatting modes (`Text = 1`, `Json = 2`). |
+| `AppenderType` | `enum` | Destination types (`Console = 1`, `File = 2`, `Rolling = 3`). |
+| `AppLogger` | `struct` | Main logger container with fluent methods (`info`, `debug`, `add_file`, etc.). |
+| `LogField` | `struct` | Key-value contextual field pair (`fld_key`, `fld_value`). |
+| `LogRecord` | `struct` | Individual log event metadata container. |
+| `Appender` | `struct` | Output destination configuration. |
 
 ### Logger Construction & Settings
 

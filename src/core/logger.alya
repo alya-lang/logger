@@ -2,12 +2,10 @@
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
 import "../types.alya"
-import "./utils.alya"
-import "./levels.alya"
 import "./formatters.alya"
 import "./appenders.alya"
 
-# Dispatches formatted message across configured appenders
+## Dispatches formatted message across configured appenders.
 pub function logger_dispatch(l, formatted)
     let num_apps = len(l.log_appenders)
     if num_apps > 0
@@ -31,7 +29,7 @@ pub function logger_dispatch(l, formatted)
     end
 end
 
-# Primary logging function
+## Primary logging function: filters by minimum log level and dispatches record.
 pub function logger_log(l, level, message)
     if level < l.log_level or l.log_level == LogLevel.Off
         return 0
@@ -50,7 +48,7 @@ pub function logger_log(l, level, message)
     return 1
 end
 
-# Logs with extra call-site structured fields
+## Logs message with call-site structured key-value fields.
 pub function logger_log_with_fields(l, level, message, extra_fields)
     if level < l.log_level or l.log_level == LogLevel.Off
         return 0
@@ -77,161 +75,205 @@ pub function logger_log_with_fields(l, level, message, extra_fields)
     return 1
 end
 
-# Configuration / fluent setters
+## Sets minimum threshold log level.
 pub function logger_set_level(l, level)
     l.log_level = level
 end
 
+## Enables or disables ANSI color output (1 = enabled, 0 = disabled).
 pub function logger_set_colored(l, colored)
     l.log_colored = colored
 end
 
+## Enables or disables timestamp prefixes in text output (1 = enabled, 0 = disabled).
 pub function logger_set_timestamps(l, timestamps)
     l.log_timestamps = timestamps
 end
 
+## Sets static log file path.
 pub function logger_set_file(l, file_path)
     l.log_file = str_from_ptr(file_path)
 end
 
+## Sets output format mode (LogFormat.Text or LogFormat.Json).
 pub function logger_set_format(l, format)
     l.log_format = format
 end
 
+## Registers a standard console stdout appender.
 pub function logger_add_console(l)
     l.log_appenders.push(appender_console())
 end
 
+## Registers a static destination file appender.
 pub function logger_add_file(l, path)
     l.log_appenders.push(appender_file(path))
 end
 
+## Registers a rolling file appender with size limit and backup retention.
 pub function logger_add_rolling_file(l, path, max_size, max_files)
     l.log_appenders.push(appender_rolling(path, max_size, max_files))
 end
 
+## Adds a persistent key-value context field to the logger.
 pub function logger_add_field(l, key, value)
     l.log_fields.push(field_new(key, value))
 end
 
+## Clears all registered appenders from the logger.
 pub function logger_clear_appenders(l)
     l.log_appenders = []
 end
 
+## Clears all persistent context fields from the logger.
 pub function logger_clear_fields(l)
     l.log_fields = []
 end
 
-# Leveled convenience logging methods
+## Emits a TRACE level log message.
 pub function logger_trace(l, msg) return logger_log(l, LogLevel.Trace, msg) end
+## Emits a DEBUG level log message.
 pub function logger_debug(l, msg) return logger_log(l, LogLevel.Debug, msg) end
+## Emits an INFO level log message.
 pub function logger_info(l, msg)  return logger_log(l, LogLevel.Info, msg) end
+## Emits a WARN level log message.
 pub function logger_warn(l, msg)  return logger_log(l, LogLevel.Warn, msg) end
+## Emits an ERROR level log message.
 pub function logger_error(l, msg) return logger_log(l, LogLevel.Error, msg) end
+## Emits a FATAL level log message.
 pub function logger_fatal(l, msg) return logger_log(l, LogLevel.Fatal, msg) end
 
-# Leveled logging with call-site fields
+## Emits a TRACE level log message with extra call-site fields.
 pub function logger_trace_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Trace, msg, fields) end
+## Emits a DEBUG level log message with extra call-site fields.
 pub function logger_debug_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Debug, msg, fields) end
+## Emits an INFO level log message with extra call-site fields.
 pub function logger_info_fields(l, msg, fields)  return logger_log_with_fields(l, LogLevel.Info, msg, fields) end
+## Emits a WARN level log message with extra call-site fields.
 pub function logger_warn_fields(l, msg, fields)  return logger_log_with_fields(l, LogLevel.Warn, msg, fields) end
+## Emits an ERROR level log message with extra call-site fields.
 pub function logger_error_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Error, msg, fields) end
+## Emits a FATAL level log message with extra call-site fields.
 pub function logger_fatal_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Fatal, msg, fields) end
 
 # --- Idiomatic Struct Methods on AppLogger ---
 
+## Struct method: emits a log message at specified level.
 pub function AppLogger.log(self, level, message)
     return logger_log(self, level, message)
 end
 
+## Struct method: emits a TRACE level log message.
 pub function AppLogger.trace(self, msg)
     return logger_trace(self, msg)
 end
 
+## Struct method: emits a DEBUG level log message.
 pub function AppLogger.debug(self, msg)
     return logger_debug(self, msg)
 end
 
+## Struct method: emits an INFO level log message.
 pub function AppLogger.info(self, msg)
     return logger_info(self, msg)
 end
 
+## Struct method: emits a WARN level log message.
 pub function AppLogger.warn(self, msg)
     return logger_warn(self, msg)
 end
 
+## Struct method: emits an ERROR level log message.
 pub function AppLogger.error(self, msg)
     return logger_error(self, msg)
 end
 
+## Struct method: emits a FATAL level log message.
 pub function AppLogger.fatal(self, msg)
     return logger_fatal(self, msg)
 end
 
+## Struct method: emits a TRACE level log message with call-site fields.
 pub function AppLogger.trace_fields(self, msg, fields)
     return logger_trace_fields(self, msg, fields)
 end
 
+## Struct method: emits a DEBUG level log message with call-site fields.
 pub function AppLogger.debug_fields(self, msg, fields)
     return logger_debug_fields(self, msg, fields)
 end
 
+## Struct method: emits an INFO level log message with call-site fields.
 pub function AppLogger.info_fields(self, msg, fields)
     return logger_info_fields(self, msg, fields)
 end
 
+## Struct method: emits a WARN level log message with call-site fields.
 pub function AppLogger.warn_fields(self, msg, fields)
     return logger_warn_fields(self, msg, fields)
 end
 
+## Struct method: emits an ERROR level log message with call-site fields.
 pub function AppLogger.error_fields(self, msg, fields)
     return logger_error_fields(self, msg, fields)
 end
 
+## Struct method: emits a FATAL level log message with call-site fields.
 pub function AppLogger.fatal_fields(self, msg, fields)
     return logger_fatal_fields(self, msg, fields)
 end
 
+## Struct method: sets minimum threshold level.
 pub function AppLogger.set_level(self, level)
     logger_set_level(self, level)
 end
 
+## Struct method: enables or disables ANSI colored output.
 pub function AppLogger.set_colored(self, colored)
     logger_set_colored(self, colored)
 end
 
+## Struct method: enables or disables timestamp prefixes.
 pub function AppLogger.set_timestamps(self, timestamps)
     logger_set_timestamps(self, timestamps)
 end
 
+## Struct method: sets destination file path.
 pub function AppLogger.set_file(self, file_path)
     logger_set_file(self, file_path)
 end
 
+## Struct method: sets output formatting mode.
 pub function AppLogger.set_format(self, format)
     logger_set_format(self, format)
 end
 
+## Struct method: adds a console appender.
 pub function AppLogger.add_console(self)
     logger_add_console(self)
 end
 
+## Struct method: adds a file appender.
 pub function AppLogger.add_file(self, path)
     logger_add_file(self, path)
 end
 
+## Struct method: adds a rolling file appender.
 pub function AppLogger.add_rolling_file(self, path, max_size, max_files)
     logger_add_rolling_file(self, path, max_size, max_files)
 end
 
+## Struct method: adds a persistent context key-value field.
 pub function AppLogger.add_field(self, key, value)
     logger_add_field(self, key, value)
 end
 
+## Struct method: clears all registered appenders.
 pub function AppLogger.clear_appenders(self)
     logger_clear_appenders(self)
 end
 
+## Struct method: clears all persistent context fields.
 pub function AppLogger.clear_fields(self)
     logger_clear_fields(self)
 end

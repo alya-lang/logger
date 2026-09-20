@@ -8,51 +8,100 @@ import "./core/formatters.alya"
 import "./core/appenders.alya"
 import "./core/logger.alya"
 
-# Top-level factory function
+## Top-level factory function to create a new configured AppLogger instance.
 pub function create(name = "", level = 2)
     return logger_new(name, level)
 end
 
+## Factory function to create a structured LogField key-value pair.
 pub function field(key, value)
     return field_new(key, value)
 end
 
+## Factory function to construct a LogRecord event.
 pub function record(level, msg, target, timestamp, fields)
     return record_new(level, msg, target, timestamp, fields)
 end
 
+## Formats a LogRecord into a human-readable text string.
 pub function format_record_text(rec, colored = 0, timestamps = 0)
     return format_text(rec, colored, timestamps)
 end
 
+## Formats a LogRecord into a compact JSON string.
 pub function format_record_json(rec)
     return format_json(rec)
 end
 
-# Clean namespaced logger methods
+## Strips ANSI escape sequences from formatted text.
+pub function strip_ansi(text)
+    return ansi_strip(text)
+end
+
+## Manually triggers log file rotation on the given path.
+pub function rotate_file(path, max_files)
+    return rotate_log_file(path, max_files)
+end
+
+## Quick global TRACE logging directly to standard output.
+pub function log_trace(msg) say level_badge(LogLevel.Trace, 1) + " " + str(msg) end
+## Quick global DEBUG logging directly to standard output.
+pub function log_debug(msg) say level_badge(LogLevel.Debug, 1) + " " + str(msg) end
+## Quick global INFO logging directly to standard output.
+pub function log_info(msg)  say level_badge(LogLevel.Info, 1) + " " + str(msg) end
+## Quick global WARN logging directly to standard output.
+pub function log_warn(msg)  say level_badge(LogLevel.Warn, 1) + " " + str(msg) end
+## Quick global ERROR logging directly to standard output.
+pub function log_error(msg) say level_badge(LogLevel.Error, 1) + " " + str(msg) end
+## Quick global FATAL logging directly to standard output.
+pub function log_fatal(msg) say level_badge(LogLevel.Fatal, 1) + " " + str(msg) end
+
+## Emits an INFO level message using target logger instance.
 pub function info(l, msg) return logger_info(l, msg) end
+## Emits a WARN level message using target logger instance.
 pub function warn(l, msg) return logger_warn(l, msg) end
+## Emits an ERROR level message using target logger instance.
 pub function error(l, msg) return logger_error(l, msg) end
+## Emits a DEBUG level message using target logger instance.
 pub function debug(l, msg) return logger_debug(l, msg) end
+## Emits a TRACE level message using target logger instance.
 pub function trace(l, msg) return logger_trace(l, msg) end
+## Emits a FATAL level message using target logger instance.
 pub function fatal(l, msg) return logger_fatal(l, msg) end
 
+## Emits an INFO level message with call-site fields.
 pub function info_fields(l, msg, fields) return logger_info_fields(l, msg, fields) end
+## Emits a WARN level message with call-site fields.
 pub function warn_fields(l, msg, fields) return logger_warn_fields(l, msg, fields) end
+## Emits an ERROR level message with call-site fields.
 pub function error_fields(l, msg, fields) return logger_error_fields(l, msg, fields) end
+## Emits a DEBUG level message with call-site fields.
 pub function debug_fields(l, msg, fields) return logger_debug_fields(l, msg, fields) end
+## Emits a TRACE level message with call-site fields.
 pub function trace_fields(l, msg, fields) return logger_trace_fields(l, msg, fields) end
+## Emits a FATAL level message with call-site fields.
 pub function fatal_fields(l, msg, fields) return logger_fatal_fields(l, msg, fields) end
 
+## Sets minimum threshold level on target logger.
 pub function set_level(l, level) return logger_set_level(l, level) end
+## Enables or disables ANSI colors on target logger.
 pub function set_colored(l, colored) return logger_set_colored(l, colored) end
+## Enables or disables timestamp prefixes on target logger.
 pub function set_timestamps(l, timestamps) return logger_set_timestamps(l, timestamps) end
+## Sets output formatting mode on target logger.
 pub function set_format(l, format) return logger_set_format(l, format) end
+## Sets static file destination on target logger.
 pub function set_file(l, path) return logger_set_file(l, path) end
 
+## Adds a standard console stdout appender to target logger.
 pub function add_console(l) return logger_add_console(l) end
+## Adds a static file destination appender to target logger.
 pub function add_file(l, path) return logger_add_file(l, path) end
+## Adds a rolling file appender with size limit and backup retention to target logger.
 pub function add_rolling_file(l, path, max_size, max_files) return logger_add_rolling_file(l, path, max_size, max_files) end
+## Adds a persistent context key-value field to target logger.
 pub function add_field(l, key, value) return logger_add_field(l, key, value) end
+## Clears all registered appenders from target logger.
 pub function clear_appenders(l) return logger_clear_appenders(l) end
+## Clears all persistent context fields from target logger.
 pub function clear_fields(l) return logger_clear_fields(l) end

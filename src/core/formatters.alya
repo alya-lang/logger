@@ -1,11 +1,10 @@
 # Text and JSON formatters for LogRecord
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
-import "../types.alya"
 import "./utils.alya"
 import "./levels.alya"
 
-# Formats record into human-readable text line
+## Formats record into a human-readable text line with optional colors and timestamps.
 pub function format_text(rec, colored, timestamps)
     let prefix = ""
     if timestamps == 1
@@ -41,7 +40,7 @@ pub function format_text(rec, colored, timestamps)
     return res
 end
 
-# Formats record into a compact JSON string
+## Formats record into a compact JSON string suitable for log ingestion.
 pub function format_json(rec)
     let lvl = level_to_str(rec.rec_level)
     let msg = json_escape_str(rec.rec_msg)

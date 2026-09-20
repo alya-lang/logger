@@ -3,7 +3,7 @@
 
 import "../types.alya"
 
-# Converts numeric log level to canonical string using pattern matching
+## Converts numeric log level to canonical string representation using pattern matching.
 pub function level_to_str(lvl)
     return when lvl
         is LogLevel.Trace => "TRACE"
@@ -17,7 +17,7 @@ pub function level_to_str(lvl)
     end
 end
 
-# Parses string to numeric log level using pattern matching
+## Parses a string representation into a numeric LogLevel enum value.
 pub function level_from_str(s)
     let up = upper(str_from_ptr(s))
     return when up
@@ -37,7 +37,7 @@ function _ansi_esc(code, s)
     return "\e[" + code + "m" + str_from_ptr(s) + "\e[0m"
 end
 
-# Returns styled badge for log level
+## Returns styled badge string for log level with optional ANSI terminal colors.
 pub function level_badge(lvl, colored)
     let name = level_to_str(lvl)
     let badge = "[" + name + "]"

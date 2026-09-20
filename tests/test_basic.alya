@@ -75,6 +75,11 @@ function main()
     let ret_dbg = method_logger.debug("Debug message via struct method")
     runner_assert_eq(r, ret_dbg, 1, "method_logger.debug works")
 
+    # 8. Modern facades
+    runner_assert_str_eq(r, log::strip_ansi("\e[32m[INFO ]\e[0m text"), "[INFO ] text", "strip_ansi removes ANSI escapes")
+    runner_assert_eq(r, log::LogLevel.Trace, 0, "LogLevel.Trace equals 0")
+    runner_assert_eq(r, log::LogLevel.Fatal, 5, "LogLevel.Fatal equals 5")
+
     let failed = runner_summary(r)
     if failed > 0
         exit(1)

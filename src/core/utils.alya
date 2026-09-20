@@ -1,7 +1,7 @@
 # Utility functions for string manipulation, time formatting, and file operations
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
-# Strips ANSI escape sequences from formatted text
+## Strips ANSI escape sequences from formatted text.
 pub function ansi_strip(text)
     let s = str_from_ptr(text)
     let slen = len(s)
@@ -27,7 +27,7 @@ pub function ansi_strip(text)
     return res
 end
 
-# Pads integer with leading zero if single digit
+## Pads integer with leading zero if single digit.
 pub function pad2(n)
     if n < 10
         return "0" + str(n)
@@ -35,7 +35,7 @@ pub function pad2(n)
     return str(n)
 end
 
-# Formats UNIX epoch seconds into HH:MM:SS
+## Formats UNIX epoch seconds into HH:MM:SS string.
 pub function format_time_hms(secs)
     let day_secs = secs % 86400
     let hh = (day_secs / 3600) % 24
@@ -44,7 +44,7 @@ pub function format_time_hms(secs)
     return pad2(hh) + ":" + pad2(mm) + ":" + pad2(ss)
 end
 
-# Checks if string contains space or delimiter characters requiring quoting
+## Checks if string contains space or delimiter characters requiring quoting.
 pub function has_space(s)
     let slen = len(s)
     let i = 0
@@ -58,7 +58,7 @@ pub function has_space(s)
     return 0
 end
 
-# Escapes special characters for JSON encoding using pattern matching
+## Escapes special characters for JSON encoding using pattern matching.
 pub function json_escape_str(s)
     let str_val = str_from_ptr(s)
     let slen = len(str_val)
@@ -80,7 +80,7 @@ pub function json_escape_str(s)
     return res
 end
 
-# Copies file from src to dst using native file operations
+## Copies file from src to dst using native file operations.
 pub function file_copy(src, dst)
     if file_exists(src) == 0
         return 0
@@ -90,7 +90,7 @@ pub function file_copy(src, dst)
     return 1
 end
 
-# Moves file from src to dst
+## Moves file from src to dst.
 pub function file_move(src, dst)
     if file_copy(src, dst) == 1
         remove_file(src)

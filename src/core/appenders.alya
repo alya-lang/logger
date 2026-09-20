@@ -1,22 +1,21 @@
 # Console, File, and RollingFile appenders
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
-import "../types.alya"
 import "./utils.alya"
 
-# Outputs line to console stdout
+## Outputs line to console standard output.
 pub function append_console(line)
     say line
 end
 
-# Appends line to a target file (strips ANSI color codes)
+## Appends line to a target file (strips ANSI color codes before writing).
 pub function append_to_file(path, line)
     let clean = ansi_strip(line)
     append_file(path, clean + "\n")
 end
 
-# Rotates log file if it exceeds max_size bytes
-# Backups are named path.1, path.2, ... path.<max_files>
+## Rotates log file if it exceeds max_size bytes.
+## Backups are named path.1, path.2, ... path.<max_files>.
 pub function rotate_log_file(path, max_files)
     if max_files <= 0
         remove_file(path)
@@ -46,7 +45,7 @@ pub function rotate_log_file(path, max_files)
     return 1
 end
 
-# Appends line to rolling file, rotating if needed
+## Appends line to rolling file, automatically triggering rotation if size exceeds threshold.
 pub function append_to_rolling_file(path, line, max_size, max_files)
     let clean = ansi_strip(line)
     let content = clean + "\n"
