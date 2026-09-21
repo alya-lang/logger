@@ -11,3 +11,7 @@ repository = "https://github.com/alya-lang/logger"
 keywords = ["alya", "alya-lang", "package", "logger", "logging", "structured-logging", "json-logs", "log-rotation"]
 
 [dependencies]
+
+# [lint]
+# disabled_rules = []
+# exclude = []
