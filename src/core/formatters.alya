@@ -63,8 +63,7 @@ pub function format_json(rec) -> string
     let target = json_escape_str(rec.rec_target)
     let ts = rec.rec_time
 
-    let out = "{"
-    out += "\"level\":\"{lvl}\",\"time\":{ts}"
+    let out = "{\"level\":\"{lvl}\",\"time\":{ts}"
     if len(target) > 0
         out += ",\"target\":\"{target}\""
     end
