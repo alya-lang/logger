@@ -1,4 +1,6 @@
-# Alya Logger - Comprehensive Feature Demonstration
+## Demo of the logger package
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
 import "../src/lib.alya" as log
 
 function main()

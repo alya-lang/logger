@@ -1,10 +1,18 @@
-# Log level conversions, labels, and ANSI styling
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # logger/levels
+##
+## Log level conversions, labels, and ANSI styling.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
 
 import "../types.alya"
 
-## Converts numeric log level to canonical string representation using pattern matching.
-pub function level_to_str(lvl)
+## Converts a numeric log level to its canonical string form.
+##
+## ### Parameters
+## - `lvl`: `LogLevel` value.
+##
+## ### Returns
+## The level name string (`"LOG"` when unknown).
+pub function level_to_str(lvl: int) -> string
     return when lvl
         is LogLevel.Trace => "TRACE"
         is LogLevel.Debug => "DEBUG"
@@ -17,8 +25,16 @@ pub function level_to_str(lvl)
     end
 end
 
-## Parses a string representation into a numeric LogLevel enum value.
-pub function level_from_str(s)
+## Parses a string representation into a numeric LogLevel value.
+##
+## Unknown names fall back to Info.
+##
+## ### Parameters
+## - `s`: Level name value.
+##
+## ### Returns
+## The `LogLevel` value.
+pub function level_from_str(s) -> int
     let up = upper(str_from_ptr(s))
     return when up
         is "TRACE"            => LogLevel.Trace
@@ -32,15 +48,23 @@ pub function level_from_str(s)
     end
 end
 
-# Private ANSI escape helper (internal encapsulation)
-function _ansi_esc(code, s)
-    return "\e[" + code + "m" + str_from_ptr(s) + "\e[0m"
+# Private ANSI escape helper (internal encapsulation).
+function _ansi_esc(code: string, s) -> string
+    let body = str_from_ptr(s)
+    return "\e[{code}m{body}\e[0m"
 end
 
-## Returns styled badge string for log level with optional ANSI terminal colors.
-pub function level_badge(lvl, colored)
+## Returns a styled badge string for a log level with optional colors.
+##
+## ### Parameters
+## - `lvl`: `LogLevel` value.
+## - `colored`: `1` enables ANSI colors, `0` returns plain text.
+##
+## ### Returns
+## The padded badge string (e.g. `"[INFO] "`).
+pub function level_badge(lvl: int, colored: int) -> string
     let name = level_to_str(lvl)
-    let badge = "[" + name + "]"
+    let badge = "[{name}]"
     while len(badge) < 7
         badge += " "
     end

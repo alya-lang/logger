@@ -1,12 +1,21 @@
-# Core Logger methods, dispatching, and field management
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # logger/logger
+##
+## Core logger methods, dispatching, and field management.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
 
 import "../types.alya"
 import "./formatters.alya"
 import "./appenders.alya"
 
-## Dispatches formatted message across configured appenders.
-pub function logger_dispatch(l, formatted)
+## Dispatches a formatted message across configured appenders.
+##
+## Falls back to console output (plus the static file path) when no
+## appenders are registered.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `formatted`: Formatted line string.
+pub function logger_dispatch(l: AppLogger, formatted: string)
     let num_apps = len(l.log_appenders)
     if num_apps > 0
         for app in l.log_appenders
@@ -29,8 +38,16 @@ pub function logger_dispatch(l, formatted)
     end
 end
 
-## Primary logging function: filters by minimum log level and dispatches record.
-pub function logger_log(l, level, message)
+## Primary logging function filtering by level and dispatching a record.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `level`: `LogLevel` value.
+## - `message`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_log(l: AppLogger, level: int, message) -> int
     if level < l.log_level or l.log_level == LogLevel.Off
         return 0
     end
@@ -48,8 +65,17 @@ pub function logger_log(l, level, message)
     return 1
 end
 
-## Logs message with call-site structured key-value fields.
-pub function logger_log_with_fields(l, level, message, extra_fields)
+## Logs a message with call-site structured key-value fields.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `level`: `LogLevel` value.
+## - `message`: Message value.
+## - `extra_fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_log_with_fields(l: AppLogger, level: int, message, extra_fields: array) -> int
     if level < l.log_level or l.log_level == LogLevel.Off
         return 0
     end
@@ -75,205 +101,483 @@ pub function logger_log_with_fields(l, level, message, extra_fields)
     return 1
 end
 
-## Sets minimum threshold log level.
-pub function logger_set_level(l, level)
+## Sets the minimum threshold log level.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `level`: `LogLevel` value.
+pub function logger_set_level(l: AppLogger, level: int)
     l.log_level = level
 end
 
-## Enables or disables ANSI color output (1 = enabled, 0 = disabled).
-pub function logger_set_colored(l, colored)
+## Enables or disables ANSI color output (`1` or `0`).
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `colored`: Flag integer.
+pub function logger_set_colored(l: AppLogger, colored: int)
     l.log_colored = colored
 end
 
-## Enables or disables timestamp prefixes in text output (1 = enabled, 0 = disabled).
-pub function logger_set_timestamps(l, timestamps)
+## Enables or disables timestamp prefixes (`1` or `0`).
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `timestamps`: Flag integer.
+pub function logger_set_timestamps(l: AppLogger, timestamps: int)
     l.log_timestamps = timestamps
 end
 
-## Sets static log file path.
-pub function logger_set_file(l, file_path)
+## Sets the static log file path.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `file_path`: File path value.
+pub function logger_set_file(l: AppLogger, file_path)
     l.log_file = str_from_ptr(file_path)
 end
 
-## Sets output format mode (LogFormat.Text or LogFormat.Json).
-pub function logger_set_format(l, format)
+## Sets the output format mode (`LogFormat.Text` or `LogFormat.Json`).
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `format`: `LogFormat` value.
+pub function logger_set_format(l: AppLogger, format: int)
     l.log_format = format
 end
 
 ## Registers a standard console stdout appender.
-pub function logger_add_console(l)
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+pub function logger_add_console(l: AppLogger)
     l.log_appenders.push(appender_console())
 end
 
 ## Registers a static destination file appender.
-pub function logger_add_file(l, path)
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `path`: File path value.
+pub function logger_add_file(l: AppLogger, path)
     l.log_appenders.push(appender_file(path))
 end
 
-## Registers a rolling file appender with size limit and backup retention.
-pub function logger_add_rolling_file(l, path, max_size, max_files)
+## Registers a rolling file appender with size limit and retention.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `path`: File path value.
+## - `max_size`: Rotation threshold bytes integer.
+## - `max_files`: Retained backup count integer.
+pub function logger_add_rolling_file(l: AppLogger, path, max_size: int, max_files: int)
     l.log_appenders.push(appender_rolling(path, max_size, max_files))
 end
 
 ## Adds a persistent key-value context field to the logger.
-pub function logger_add_field(l, key, value)
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `key`: Field key value.
+## - `value`: Field value.
+pub function logger_add_field(l: AppLogger, key, value)
     l.log_fields.push(field_new(key, value))
 end
 
 ## Clears all registered appenders from the logger.
-pub function logger_clear_appenders(l)
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+pub function logger_clear_appenders(l: AppLogger)
     l.log_appenders = []
 end
 
 ## Clears all persistent context fields from the logger.
-pub function logger_clear_fields(l)
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+pub function logger_clear_fields(l: AppLogger)
     l.log_fields = []
 end
 
 ## Emits a TRACE level log message.
-pub function logger_trace(l, msg) return logger_log(l, LogLevel.Trace, msg) end
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_trace(l: AppLogger, msg) -> int return logger_log(l, LogLevel.Trace, msg) end
 ## Emits a DEBUG level log message.
-pub function logger_debug(l, msg) return logger_log(l, LogLevel.Debug, msg) end
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_debug(l: AppLogger, msg) -> int return logger_log(l, LogLevel.Debug, msg) end
 ## Emits an INFO level log message.
-pub function logger_info(l, msg)  return logger_log(l, LogLevel.Info, msg) end
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_info(l: AppLogger, msg) -> int  return logger_log(l, LogLevel.Info, msg) end
 ## Emits a WARN level log message.
-pub function logger_warn(l, msg)  return logger_log(l, LogLevel.Warn, msg) end
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_warn(l: AppLogger, msg) -> int  return logger_log(l, LogLevel.Warn, msg) end
 ## Emits an ERROR level log message.
-pub function logger_error(l, msg) return logger_log(l, LogLevel.Error, msg) end
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_error(l: AppLogger, msg) -> int return logger_log(l, LogLevel.Error, msg) end
 ## Emits a FATAL level log message.
-pub function logger_fatal(l, msg) return logger_log(l, LogLevel.Fatal, msg) end
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_fatal(l: AppLogger, msg) -> int return logger_log(l, LogLevel.Fatal, msg) end
 
-## Emits a TRACE level log message with extra call-site fields.
-pub function logger_trace_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Trace, msg, fields) end
-## Emits a DEBUG level log message with extra call-site fields.
-pub function logger_debug_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Debug, msg, fields) end
-## Emits an INFO level log message with extra call-site fields.
-pub function logger_info_fields(l, msg, fields)  return logger_log_with_fields(l, LogLevel.Info, msg, fields) end
-## Emits a WARN level log message with extra call-site fields.
-pub function logger_warn_fields(l, msg, fields)  return logger_log_with_fields(l, LogLevel.Warn, msg, fields) end
-## Emits an ERROR level log message with extra call-site fields.
-pub function logger_error_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Error, msg, fields) end
-## Emits a FATAL level log message with extra call-site fields.
-pub function logger_fatal_fields(l, msg, fields) return logger_log_with_fields(l, LogLevel.Fatal, msg, fields) end
+## Emits a TRACE level message with extra call-site fields.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_trace_fields(l: AppLogger, msg, fields: array) -> int return logger_log_with_fields(l, LogLevel.Trace, msg, fields) end
+## Emits a DEBUG level message with extra call-site fields.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_debug_fields(l: AppLogger, msg, fields: array) -> int return logger_log_with_fields(l, LogLevel.Debug, msg, fields) end
+## Emits an INFO level message with extra call-site fields.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_info_fields(l: AppLogger, msg, fields: array) -> int  return logger_log_with_fields(l, LogLevel.Info, msg, fields) end
+## Emits a WARN level message with extra call-site fields.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_warn_fields(l: AppLogger, msg, fields: array) -> int  return logger_log_with_fields(l, LogLevel.Warn, msg, fields) end
+## Emits an ERROR level message with extra call-site fields.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_error_fields(l: AppLogger, msg, fields: array) -> int return logger_log_with_fields(l, LogLevel.Error, msg, fields) end
+## Emits a FATAL level message with extra call-site fields.
+##
+## ### Parameters
+## - `l`: Target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function logger_fatal_fields(l: AppLogger, msg, fields: array) -> int return logger_log_with_fields(l, LogLevel.Fatal, msg, fields) end
 
-# --- Idiomatic Struct Methods on AppLogger ---
+# ───────────────────────────────────────────────────────────────
+# Idiomatic Struct Methods on AppLogger
+# ───────────────────────────────────────────────────────────────
 
-## Struct method: emits a log message at specified level.
-pub function AppLogger.log(self, level, message)
+## Emits a log message at the specified level.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `level`: `LogLevel` value.
+## - `message`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.log(self: AppLogger, level: int, message) -> int
     return logger_log(self, level, message)
 end
 
-## Struct method: emits a TRACE level log message.
-pub function AppLogger.trace(self, msg)
+## Emits a TRACE level log message.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.trace(self: AppLogger, msg) -> int
     return logger_trace(self, msg)
 end
 
-## Struct method: emits a DEBUG level log message.
-pub function AppLogger.debug(self, msg)
+## Emits a DEBUG level log message.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.debug(self: AppLogger, msg) -> int
     return logger_debug(self, msg)
 end
 
-## Struct method: emits an INFO level log message.
-pub function AppLogger.info(self, msg)
+## Emits an INFO level log message.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.info(self: AppLogger, msg) -> int
     return logger_info(self, msg)
 end
 
-## Struct method: emits a WARN level log message.
-pub function AppLogger.warn(self, msg)
+## Emits a WARN level log message.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.warn(self: AppLogger, msg) -> int
     return logger_warn(self, msg)
 end
 
-## Struct method: emits an ERROR level log message.
-pub function AppLogger.error(self, msg)
+## Emits an ERROR level log message.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.error(self: AppLogger, msg) -> int
     return logger_error(self, msg)
 end
 
-## Struct method: emits a FATAL level log message.
-pub function AppLogger.fatal(self, msg)
+## Emits a FATAL level log message.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.fatal(self: AppLogger, msg) -> int
     return logger_fatal(self, msg)
 end
 
-## Struct method: emits a TRACE level log message with call-site fields.
-pub function AppLogger.trace_fields(self, msg, fields)
+## Emits a TRACE level message with call-site fields.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.trace_fields(self: AppLogger, msg, fields: array) -> int
     return logger_trace_fields(self, msg, fields)
 end
 
-## Struct method: emits a DEBUG level log message with call-site fields.
-pub function AppLogger.debug_fields(self, msg, fields)
+## Emits a DEBUG level message with call-site fields.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.debug_fields(self: AppLogger, msg, fields: array) -> int
     return logger_debug_fields(self, msg, fields)
 end
 
-## Struct method: emits an INFO level log message with call-site fields.
-pub function AppLogger.info_fields(self, msg, fields)
+## Emits an INFO level message with call-site fields.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.info_fields(self: AppLogger, msg, fields: array) -> int
     return logger_info_fields(self, msg, fields)
 end
 
-## Struct method: emits a WARN level log message with call-site fields.
-pub function AppLogger.warn_fields(self, msg, fields)
+## Emits a WARN level message with call-site fields.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.warn_fields(self: AppLogger, msg, fields: array) -> int
     return logger_warn_fields(self, msg, fields)
 end
 
-## Struct method: emits an ERROR level log message with call-site fields.
-pub function AppLogger.error_fields(self, msg, fields)
+## Emits an ERROR level message with call-site fields.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.error_fields(self: AppLogger, msg, fields: array) -> int
     return logger_error_fields(self, msg, fields)
 end
 
-## Struct method: emits a FATAL level log message with call-site fields.
-pub function AppLogger.fatal_fields(self, msg, fields)
+## Emits a FATAL level message with call-site fields.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `msg`: Message value.
+## - `fields`: Additional `LogField` array.
+##
+## ### Returns
+## `1` when emitted, `0` when filtered out.
+pub function AppLogger.fatal_fields(self: AppLogger, msg, fields: array) -> int
     return logger_fatal_fields(self, msg, fields)
 end
 
-## Struct method: sets minimum threshold level.
-pub function AppLogger.set_level(self, level)
+## Sets the minimum threshold level.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `level`: `LogLevel` value.
+pub function AppLogger.set_level(self: AppLogger, level: int)
     logger_set_level(self, level)
 end
 
-## Struct method: enables or disables ANSI colored output.
-pub function AppLogger.set_colored(self, colored)
+## Enables or disables ANSI colored output.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `colored`: Flag integer.
+pub function AppLogger.set_colored(self: AppLogger, colored: int)
     logger_set_colored(self, colored)
 end
 
-## Struct method: enables or disables timestamp prefixes.
-pub function AppLogger.set_timestamps(self, timestamps)
+## Enables or disables timestamp prefixes.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `timestamps`: Flag integer.
+pub function AppLogger.set_timestamps(self: AppLogger, timestamps: int)
     logger_set_timestamps(self, timestamps)
 end
 
-## Struct method: sets destination file path.
-pub function AppLogger.set_file(self, file_path)
+## Sets the destination file path.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `file_path`: File path value.
+pub function AppLogger.set_file(self: AppLogger, file_path)
     logger_set_file(self, file_path)
 end
 
-## Struct method: sets output formatting mode.
-pub function AppLogger.set_format(self, format)
+## Sets the output formatting mode.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `format`: `LogFormat` value.
+pub function AppLogger.set_format(self: AppLogger, format: int)
     logger_set_format(self, format)
 end
 
-## Struct method: adds a console appender.
-pub function AppLogger.add_console(self)
+## Adds a console appender.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+pub function AppLogger.add_console(self: AppLogger)
     logger_add_console(self)
 end
 
-## Struct method: adds a file appender.
-pub function AppLogger.add_file(self, path)
+## Adds a file appender.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `path`: File path value.
+pub function AppLogger.add_file(self: AppLogger, path)
     logger_add_file(self, path)
 end
 
-## Struct method: adds a rolling file appender.
-pub function AppLogger.add_rolling_file(self, path, max_size, max_files)
+## Adds a rolling file appender.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `path`: File path value.
+## - `max_size`: Rotation threshold bytes integer.
+## - `max_files`: Retained backup count integer.
+pub function AppLogger.add_rolling_file(self: AppLogger, path, max_size: int, max_files: int)
     logger_add_rolling_file(self, path, max_size, max_files)
 end
 
-## Struct method: adds a persistent context key-value field.
-pub function AppLogger.add_field(self, key, value)
+## Adds a persistent context key-value field.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+## - `key`: Field key value.
+## - `value`: Field value.
+pub function AppLogger.add_field(self: AppLogger, key, value)
     logger_add_field(self, key, value)
 end
 
-## Struct method: clears all registered appenders.
-pub function AppLogger.clear_appenders(self)
+## Clears all registered appenders.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+pub function AppLogger.clear_appenders(self: AppLogger)
     logger_clear_appenders(self)
 end
 
-## Struct method: clears all persistent context fields.
-pub function AppLogger.clear_fields(self)
+## Clears all persistent context fields.
+##
+## ### Parameters
+## - `self`: The target `AppLogger` instance.
+pub function AppLogger.clear_fields(self: AppLogger)
     logger_clear_fields(self)
 end

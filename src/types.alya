@@ -1,5 +1,10 @@
-# Types and constants for alya-lang/logger
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # logger/types
+##
+## Types and constants for the logger package.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
+##
+## Defines log levels, formats, appender kinds, fields, records, and the
+## logger state container with its factories.
 
 ## Public enumeration of supported log levels.
 pub enum LogLevel
@@ -26,66 +31,134 @@ pub enum AppenderType
 end
 
 ## Key-value field structure for structured contextual logging.
+##
+## ### Fields
+## - `fld_key`: Field key string.
+## - `fld_value`: Field value string.
 pub struct LogField
-    fld_key,
-    fld_value
+    fld_key: string,
+    fld_value: string
 end
 
 ## Factory function to create a new LogField key-value pair.
-pub function field_new(key, value)
-    return LogField(str_from_ptr(key), str_from_ptr(value))
+##
+## ### Parameters
+## - `key`: Field key value.
+## - `value`: Field value.
+##
+## ### Returns
+## The new `LogField` instance.
+pub function field_new(key, value) -> LogField
+    return LogField { fld_key: str_from_ptr(key), fld_value: str_from_ptr(value) }
 end
 
-## A single log record event representing an emitted message with metadata.
+## A single log record event with message and metadata.
+##
+## ### Fields
+## - `rec_level`: `LogLevel` value.
+## - `rec_msg`: Message string.
+## - `rec_target`: Logger target name.
+## - `rec_time`: Unix timestamp integer.
+## - `rec_fields`: `LogField` array.
 pub struct LogRecord
-    rec_level,
-    rec_msg,
-    rec_target,
-    rec_time,
-    rec_fields
+    rec_level: int,
+    rec_msg: string,
+    rec_target: string,
+    rec_time: int,
+    rec_fields: array
 end
 
 ## Factory function to construct a new LogRecord.
-pub function record_new(level, msg, target, timestamp, fields)
-    return LogRecord(level, str_from_ptr(msg), str_from_ptr(target), timestamp, fields)
+##
+## ### Parameters
+## - `level`: `LogLevel` value.
+## - `msg`: Message value.
+## - `target`: Logger target name value.
+## - `timestamp`: Unix timestamp integer.
+## - `fields`: `LogField` array.
+##
+## ### Returns
+## The new `LogRecord` instance.
+pub function record_new(level: int, msg, target, timestamp: int, fields: array) -> LogRecord
+    return LogRecord { rec_level: level, rec_msg: str_from_ptr(msg), rec_target: str_from_ptr(target), rec_time: timestamp, rec_fields: fields }
 end
 
 ## An output destination definition (console, file, or rolling file).
+##
+## ### Fields
+## - `app_type`: `AppenderType` value.
+## - `app_target`: File path string (empty for console).
+## - `app_max_size`: Rotation size threshold in bytes.
+## - `app_max_files`: Retained backup count.
 pub struct Appender
-    app_type,
-    app_target,
-    app_max_size,
-    app_max_files
+    app_type: int,
+    app_target: string,
+    app_max_size: int,
+    app_max_files: int
 end
 
 ## Factory function to create a standard Console appender.
-pub function appender_console()
-    return Appender(AppenderType.Console, "", 0, 0)
+##
+## ### Returns
+## The new `Appender` instance.
+pub function appender_console() -> Appender
+    return Appender { app_type: AppenderType.Console, app_target: "", app_max_size: 0, app_max_files: 0 }
 end
 
 ## Factory function to create a static File appender.
-pub function appender_file(path)
-    return Appender(AppenderType.File, str_from_ptr(path), 0, 0)
+##
+## ### Parameters
+## - `path`: Destination file path value.
+##
+## ### Returns
+## The new `Appender` instance.
+pub function appender_file(path) -> Appender
+    return Appender { app_type: AppenderType.File, app_target: str_from_ptr(path), app_max_size: 0, app_max_files: 0 }
 end
 
-## Factory function to create a Rolling File appender with size limit and backup retention.
-pub function appender_rolling(path, max_size_bytes, max_files)
-    return Appender(AppenderType.Rolling, str_from_ptr(path), max_size_bytes, max_files)
+## Factory function to create a Rolling File appender.
+##
+## ### Parameters
+## - `path`: Destination file path value.
+## - `max_size_bytes`: Rotation size threshold integer.
+## - `max_files`: Retained backup count integer.
+##
+## ### Returns
+## The new `Appender` instance.
+pub function appender_rolling(path, max_size_bytes: int, max_files: int) -> Appender
+    return Appender { app_type: AppenderType.Rolling, app_target: str_from_ptr(path), app_max_size: max_size_bytes, app_max_files: max_files }
 end
 
 ## Main Logger configuration and state container struct.
+##
+## ### Fields
+## - `log_name`: Logger name string.
+## - `log_level`: Minimum `LogLevel` value.
+## - `log_colored`: `1` enables ANSI colors, `0` disables.
+## - `log_timestamps`: `1` prefixes timestamps, `0` hides them.
+## - `log_file`: Static file path string (empty when unused).
+## - `log_format`: `LogFormat` value.
+## - `log_appenders`: `Appender` array.
+## - `log_fields`: Persistent `LogField` array.
 pub struct AppLogger
-    log_name,
-    log_level,
-    log_colored,
-    log_timestamps,
-    log_file,
-    log_format,
-    log_appenders,
-    log_fields
+    log_name: string,
+    log_level: int,
+    log_colored: int,
+    log_timestamps: int,
+    log_file: string,
+    log_format: int,
+    log_appenders: array,
+    log_fields: array
 end
 
 ## Factory constructor to initialize an AppLogger instance.
-pub function logger_new(name = "", level = 2)
-    return AppLogger(str_from_ptr(name), level, 1, 0, "", LogFormat.Text, [], [])
+##
+## ### Parameters
+## - `name`: Logger name value. Defaults to `""`.
+## - `level`: Minimum `LogLevel` value. Defaults to `2` (Info).
+##
+## ### Returns
+## The new `AppLogger` instance.
+pub function logger_new(name = "", level: int = 2) -> AppLogger
+    return AppLogger { log_name: str_from_ptr(name), log_level: level, log_colored: 1, log_timestamps: 0, log_file: "", log_format: LogFormat.Text, log_appenders: [], log_fields: [] }
 end
