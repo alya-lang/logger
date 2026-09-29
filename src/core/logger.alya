@@ -19,19 +19,24 @@ pub function logger_dispatch(l: AppLogger, formatted: string)
     let num_apps = len(l.log_appenders)
     if num_apps > 0
         for app in l.log_appenders
-            when app.app_type
-                is AppenderType.Console then
-                    append_console(formatted)
-                is AppenderType.File then
-                    append_to_file(app.app_target, formatted)
-                is AppenderType.Rolling then
-                    append_to_rolling_file(app.app_target, formatted, app.app_max_size, app.app_max_files)
+            if app.app_type == AppenderType.Console
+                append_console(formatted)
+            end
+            @cfg(feature = "file")
+            if app.app_type == AppenderType.File
+                append_to_file(app.app_target, formatted)
+            end
+            @cfg(feature = "file")
+            if app.app_type == AppenderType.Rolling
+                append_to_rolling_file(app.app_target, formatted, app.app_max_size, app.app_max_files)
             end
         end
     else
         # Default behavior: Console output + optional log_file
         say formatted
+        @cfg(feature = "file")
         let fpath = str_from_ptr(l.log_file)
+        @cfg(feature = "file")
         if len(fpath) > 0
             append_to_file(fpath, formatted)
         end
@@ -54,12 +59,14 @@ pub function logger_log(l: AppLogger, level: int, message) -> int
 
     let rec = record_new(level, message, l.log_name, time(), l.log_fields)
     let formatted = ""
-    when l.log_format
-        is LogFormat.Json then
-            formatted = format_json(rec)
-        else
-            formatted = format_text(rec, l.log_colored, l.log_timestamps)
+    @cfg(feature = "json")
+    if l.log_format == LogFormat.Json
+        formatted = format_json(rec)
+    else
+        formatted = format_text(rec, l.log_colored, l.log_timestamps)
     end
+    @cfg(not(feature = "json"))
+    formatted = format_text(rec, l.log_colored, l.log_timestamps)
 
     logger_dispatch(l, formatted)
     return 1
@@ -90,12 +97,14 @@ pub function logger_log_with_fields(l: AppLogger, level: int, message, extra_fie
 
     let rec = record_new(level, message, l.log_name, time(), all_fields)
     let formatted = ""
-    when l.log_format
-        is LogFormat.Json then
-            formatted = format_json(rec)
-        else
-            formatted = format_text(rec, l.log_colored, l.log_timestamps)
+    @cfg(feature = "json")
+    if l.log_format == LogFormat.Json
+        formatted = format_json(rec)
+    else
+        formatted = format_text(rec, l.log_colored, l.log_timestamps)
     end
+    @cfg(not(feature = "json"))
+    formatted = format_text(rec, l.log_colored, l.log_timestamps)
 
     logger_dispatch(l, formatted)
     return 1
@@ -156,20 +165,26 @@ end
 
 ## Registers a static destination file appender.
 ##
+## Requires the `file` feature (default-on).
+##
 ## ### Parameters
 ## - `l`: Target `AppLogger` instance.
 ## - `path`: File path value.
+@cfg(feature = "file")
 pub function logger_add_file(l: AppLogger, path)
     l.log_appenders.push(appender_file(path))
 end
 
 ## Registers a rolling file appender with size limit and retention.
 ##
+## Requires the `file` feature (default-on).
+##
 ## ### Parameters
 ## - `l`: Target `AppLogger` instance.
 ## - `path`: File path value.
 ## - `max_size`: Rotation threshold bytes integer.
 ## - `max_files`: Retained backup count integer.
+@cfg(feature = "file")
 pub function logger_add_rolling_file(l: AppLogger, path, max_size: int, max_files: int)
     l.log_appenders.push(appender_rolling(path, max_size, max_files))
 end
@@ -538,20 +553,26 @@ end
 
 ## Adds a file appender.
 ##
+## Requires the `file` feature (default-on).
+##
 ## ### Parameters
 ## - `self`: The target `AppLogger` instance.
 ## - `path`: File path value.
+@cfg(feature = "file")
 pub function AppLogger.add_file(self: AppLogger, path)
     logger_add_file(self, path)
 end
 
 ## Adds a rolling file appender.
 ##
+## Requires the `file` feature (default-on).
+##
 ## ### Parameters
 ## - `self`: The target `AppLogger` instance.
 ## - `path`: File path value.
 ## - `max_size`: Rotation threshold bytes integer.
 ## - `max_files`: Retained backup count integer.
+@cfg(feature = "file")
 pub function AppLogger.add_rolling_file(self: AppLogger, path, max_size: int, max_files: int)
     logger_add_rolling_file(self, path, max_size, max_files)
 end

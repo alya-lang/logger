@@ -64,6 +64,23 @@ alya add logger --git https://github.com/alya-lang/logger --branch main
 alya install
 ```
 
+### Package Features
+
+| Feature | Default | Description |
+|:---|:---:|:---|
+| `json` | ✅ | JSON log formatting (`format_record_json`, `LogFormat.Json`). Without it text formatting is used. |
+| `file` | ✅ | File appenders and rotation (`add_file`, `add_rolling_file`, `rotate_file`). Without it console-only logging remains. |
+
+```bash
+# Full build (default)
+alya install
+alya test
+
+# Slim console-only build
+alya install --no-default-features
+alya test --no-default-features
+```
+
 ---
 
 ## 🚀 Quick Start

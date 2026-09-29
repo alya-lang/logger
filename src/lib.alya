@@ -64,11 +64,14 @@ end
 
 ## Formats a LogRecord into a compact JSON string.
 ##
+## Requires the `json` feature (default-on).
+##
 ## ### Parameters
 ## - `rec`: Target `LogRecord` instance.
 ##
 ## ### Returns
 ## The JSON line string.
+@cfg(feature = "json")
 pub function format_record_json(rec: LogRecord) -> string
     return format_json(rec)
 end
@@ -86,12 +89,15 @@ end
 
 ## Manually triggers log file rotation on the given path.
 ##
+## Requires the `file` feature (default-on).
+##
 ## ### Parameters
 ## - `path`: Log file path string.
 ## - `max_files`: Retained backup count integer.
 ##
 ## ### Returns
 ## `1` on completion.
+@cfg(feature = "file")
 pub function rotate_file(path: string, max_files: int) -> int
     return rotate_log_file(path, max_files)
 end
@@ -305,17 +311,23 @@ pub function set_file(l: AppLogger, path) return logger_set_file(l, path) end
 pub function add_console(l: AppLogger) return logger_add_console(l) end
 ## Adds a static file destination appender to a target logger.
 ##
+## Requires the `file` feature (default-on).
+##
 ## ### Parameters
 ## - `l`: Target `AppLogger` instance.
 ## - `path`: File path value.
+@cfg(feature = "file")
 pub function add_file(l: AppLogger, path) return logger_add_file(l, path) end
 ## Adds a rolling file appender with size limit and retention.
+##
+## Requires the `file` feature (default-on).
 ##
 ## ### Parameters
 ## - `l`: Target `AppLogger` instance.
 ## - `path`: File path value.
 ## - `max_size`: Rotation threshold bytes integer.
 ## - `max_files`: Retained backup count integer.
+@cfg(feature = "file")
 pub function add_rolling_file(l: AppLogger, path, max_size: int, max_files: int) return logger_add_rolling_file(l, path, max_size, max_files) end
 ## Adds a persistent context key-value field to a target logger.
 ##

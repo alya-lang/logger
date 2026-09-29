@@ -18,6 +18,7 @@ function cleanup_files(base)
     end
 end
 
+@cfg(feature = "file")
 function main()
     test_suite("Logger File Rotation Tests")
     let r = runner_new()
@@ -67,6 +68,18 @@ function main()
 
     cleanup_files(base_log)
 
+    let failed = runner_summary(r)
+    if failed > 0
+        exit(1)
+    end
+end
+
+# File rotation needs the `file` feature: register an empty suite
+# so the file still compiles and passes in slim views.
+@cfg(not(feature = "file"))
+function main()
+    test_suite("Logger File Rotation Tests (skipped without file feature)")
+    let r = runner_new()
     let failed = runner_summary(r)
     if failed > 0
         exit(1)

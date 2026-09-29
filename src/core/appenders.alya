@@ -15,9 +15,12 @@ end
 
 ## Appends a line to a target file (ANSI codes stripped before writing).
 ##
+## Requires the `file` feature (default-on).
+##
 ## ### Parameters
 ## - `path`: Destination file path string.
 ## - `line`: Line string.
+@cfg(feature = "file")
 pub function append_to_file(path: string, line: string)
     let clean = ansi_strip(line)
     append_file(path, "{clean}\n")
@@ -26,6 +29,7 @@ end
 ## Rotates a log file when it exceeds its size budget.
 ##
 ## Backups are named `path.1`, `path.2`, ... `path.<max_files>`.
+## Requires the `file` feature (default-on).
 ##
 ## ### Parameters
 ## - `path`: Active log file path string.
@@ -33,6 +37,7 @@ end
 ##
 ## ### Returns
 ## `1` on completion.
+@cfg(feature = "file")
 pub function rotate_log_file(path: string, max_files: int) -> int
     if max_files <= 0
         remove_file(path)
@@ -65,11 +70,14 @@ end
 
 ## Appends a line to a rolling file, rotating past the size threshold.
 ##
+## Requires the `file` feature (default-on).
+##
 ## ### Parameters
 ## - `path`: Destination file path string.
 ## - `line`: Line string.
 ## - `max_size`: Rotation threshold bytes integer.
 ## - `max_files`: Retained backup count integer.
+@cfg(feature = "file")
 pub function append_to_rolling_file(path: string, line: string, max_size: int, max_files: int)
     let clean = ansi_strip(line)
     let content = "{clean}\n"

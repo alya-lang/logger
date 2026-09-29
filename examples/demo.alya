@@ -40,6 +40,18 @@ function main()
     ]
     log::info_fields(auth_log, "User session authenticated", call_fields)
 
+    @cfg(feature = "json")
+    demo_json_format()
+    @cfg(feature = "file")
+    demo_rolling_file()
+
+    say "\n✓ Logger demonstration completed successfully."
+end
+
+main()
+
+@cfg(feature = "json")
+function demo_json_format()
     # 4. JSON Format Output
     say "\n--- 4. JSON Formatted Output ---"
     let json_log = log::create("Metrics", log::LogLevel.Info)
@@ -51,7 +63,10 @@ function main()
         log::field("active_threads", "8")
     ]
     log::info_fields(json_log, "System telemetry report", metrics_fields)
+end
 
+@cfg(feature = "file")
+function demo_rolling_file()
     # 5. Multi-Appender & File Rotation Demo
     say "\n--- 5. Rolling File Appender & Rotation ---"
     let demo_log = "demo_app.log"
@@ -82,8 +97,4 @@ function main()
     if file_exists(demo_log + ".1") == 1
         remove_file(demo_log + ".1")
     end
-
-    say "\n✓ Logger demonstration completed successfully."
 end
-
-main()

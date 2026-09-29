@@ -57,6 +57,9 @@ end
 ##
 ## ### Returns
 ## The JSON line string.
+##
+## Requires the `json` feature (default-on).
+@cfg(feature = "json")
 pub function format_json(rec) -> string
     let lvl = level_to_str(rec.rec_level)
     let msg = json_escape_str(rec.rec_msg)

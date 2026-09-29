@@ -3,6 +3,60 @@
 import "std/test"
 import "../src/lib.alya" as log
 
+@cfg(feature = "file")
+function file_appender_text(r)
+    let test_file = "temp_appender_test.log"
+    if file_exists(test_file) == 1
+        remove_file(test_file)
+    end
+
+    # 2. File appender writing text logs
+    let file_logger = log::create("FileApp", log::LogLevel.Info)
+    log::logger_set_colored(file_logger, 0)
+    log::logger_add_file(file_logger, test_file)
+
+    log::logger_info(file_logger, "Line 1: Server started")
+    log::logger_warn(file_logger, "Line 2: High load warning")
+    log::logger_debug(file_logger, "Line 3: Should be filtered out")
+
+    runner_assert_eq(r, file_exists(test_file), 1, "log file was created")
+    let content = read_file(test_file)
+    runner_assert_true(r, len(content) > 0, "log file is not empty")
+
+    # Check contents
+    let has_line1 = log::has_space(content)
+    runner_assert_true(r, has_line1, "content has space")
+    runner_assert_eq(r, log::ansi_strip(content) == content, 1, "no ANSI codes in file output")
+
+    if file_exists(test_file) == 1
+        remove_file(test_file)
+    end
+end
+
+@cfg(feature = "file")
+@cfg(feature = "json")
+function json_file_logging(r)
+    # 3. JSON format file logging
+    let json_file = "temp_json_appender.log"
+    if file_exists(json_file) == 1
+        remove_file(json_file)
+    end
+
+    let json_logger = log::create("JsonApp", log::LogLevel.Info)
+    log::logger_set_format(json_logger, log::LogFormat.Json)
+    log::logger_add_file(json_logger, json_file)
+
+    log::logger_info(json_logger, "JSON event message")
+
+    runner_assert_eq(r, file_exists(json_file), 1, "json log file created")
+    let json_content = read_file(json_file)
+    runner_assert_eq(r, char_at(json_content, 0), "{", "first char of file is {")
+
+    if file_exists(json_file) == 1
+        remove_file(json_file)
+    end
+end
+
 function main()
     test_suite("Logger Appenders Tests")
     let r = runner_new()
@@ -25,47 +79,11 @@ function main()
     runner_assert_eq(r, ap_rot.app_max_size, 1024, "rolling appender max_size is 1024")
     runner_assert_eq(r, ap_rot.app_max_files, 3, "rolling appender max_files is 3")
 
-    # 2. File appender writing text logs
-    let file_logger = log::create("FileApp", log::LogLevel.Info)
-    log::logger_set_colored(file_logger, 0)
-    log::logger_add_file(file_logger, test_file)
-
-    log::logger_info(file_logger, "Line 1: Server started")
-    log::logger_warn(file_logger, "Line 2: High load warning")
-    log::logger_debug(file_logger, "Line 3: Should be filtered out")
-
-    runner_assert_eq(r, file_exists(test_file), 1, "log file was created")
-    let content = read_file(test_file)
-    runner_assert_true(r, len(content) > 0, "log file is not empty")
-
-    # Check contents
-    let has_line1 = log::has_space(content)
-    runner_assert_true(r, has_line1, "content has space")
-    runner_assert_eq(r, log::ansi_strip(content) == content, 1, "no ANSI codes in file output")
-
-    # 3. JSON format file logging
-    let json_file = "temp_json_appender.log"
-    if file_exists(json_file) == 1
-        remove_file(json_file)
-    end
-
-    let json_logger = log::create("JsonApp", log::LogLevel.Info)
-    log::logger_set_format(json_logger, log::LogFormat.Json)
-    log::logger_add_file(json_logger, json_file)
-
-    log::logger_info(json_logger, "JSON event message")
-
-    runner_assert_eq(r, file_exists(json_file), 1, "json log file created")
-    let json_content = read_file(json_file)
-    runner_assert_eq(r, char_at(json_content, 0), "{", "first char of file is {")
-
-    # Clean up
-    if file_exists(test_file) == 1
-        remove_file(test_file)
-    end
-    if file_exists(json_file) == 1
-        remove_file(json_file)
-    end
+    @cfg(feature = "file")
+    file_appender_text(r)
+    @cfg(feature = "file")
+    @cfg(feature = "json")
+    json_file_logging(r)
 
     let failed = runner_summary(r)
     if failed > 0

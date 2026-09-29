@@ -33,15 +33,6 @@ function main()
     end
     bench_stop(runner, "format_record_text with fields + timestamp (2k runs)")
 
-    # 3. JSON record formatting
-    bench_start(runner, 2000)
-    let k = 0
-    while k < 2000
-        log::format_record_json(rec_text)
-        k += 1
-    end
-    bench_stop(runner, "format_record_json with fields (2k runs)")
-
     # 4. Level filtering rejection (fast path)
     let l_filter = log::create("FilterBench", log::LogLevel.Warn)
     bench_start(runner, 2000)
@@ -52,7 +43,22 @@ function main()
     end
     bench_stop(runner, "logger_log filtered level rejection (2k runs)")
 
+    @cfg(feature = "json")
+    bench_json_format(runner, rec_text)
+
     bench_summary(runner)
 end
 
 main()
+
+@cfg(feature = "json")
+function bench_json_format(runner, rec_text)
+    # 3. JSON record formatting
+    bench_start(runner, 2000)
+    let k = 0
+    while k < 2000
+        log::format_record_json(rec_text)
+        k += 1
+    end
+    bench_stop(runner, "format_record_json with fields (2k runs)")
+end
