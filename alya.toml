@@ -12,11 +12,6 @@ keywords = ["alya", "alya-lang", "package", "logger", "logging", "structured-log
 
 [dependencies]
 
-[features]
-default = ["json", "file"]
-json = []
-file = []
-
 # [lint]
 # disabled_rules = []
 # exclude = []
@@ -29,3 +24,8 @@ file = []
 
 # [bench]
 # exclude = []
+
+[features]
+default = ["json", "file"]
+json = []
+file = []
