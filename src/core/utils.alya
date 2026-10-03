@@ -74,7 +74,7 @@ end
 ##
 ## ### Returns
 ## `1` when quoting is needed, `0` otherwise.
-pub function has_space(s: string) -> int
+pub function has_space(s: string) -> bool
     let slen = len(s)
     let i = 0
     while i < slen
@@ -123,7 +123,7 @@ end
 ##
 ## ### Returns
 ## `1` on success, `0` when the source is missing.
-pub function file_copy(src: string, dst: string) -> int
+pub function file_copy(src: string, dst: string) -> bool
     if file_exists(src) == false
         return false
     end
@@ -140,7 +140,7 @@ end
 ##
 ## ### Returns
 ## `1` on success, `0` otherwise.
-pub function file_move(src: string, dst: string) -> int
+pub function file_move(src: string, dst: string) -> bool
     if file_copy(src, dst) == true
         remove_file(src)
         return true

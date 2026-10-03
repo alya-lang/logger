@@ -52,7 +52,7 @@ end
 ##
 ## ### Returns
 ## `1` when emitted, `0` when filtered out.
-pub function logger_log(l: AppLogger, level: int, message) -> int
+pub function logger_log(l: AppLogger, level: int, message) -> bool
     if level < l.log_level or l.log_level == LogLevel.Off
         return false
     end
@@ -82,7 +82,7 @@ end
 ##
 ## ### Returns
 ## `1` when emitted, `0` when filtered out.
-pub function logger_log_with_fields(l: AppLogger, level: int, message, extra_fields: array) -> int
+pub function logger_log_with_fields(l: AppLogger, level: int, message, extra_fields: array) -> bool
     if level < l.log_level or l.log_level == LogLevel.Off
         return false
     end
