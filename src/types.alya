@@ -160,5 +160,5 @@ end
 ## ### Returns
 ## The new `AppLogger` instance.
 pub function logger_new(name = "", level: int = 2) -> AppLogger
-    return AppLogger { log_name: str_from_ptr(name), log_level: level, log_colored: 1, log_timestamps: 0, log_file: "", log_format: LogFormat.Text, log_appenders: [], log_fields: [] }
+    return AppLogger { log_name: str_from_ptr(name), log_level: level, log_colored: true, log_timestamps: false, log_file: "", log_format: LogFormat.Text, log_appenders: [], log_fields: [] }
 end

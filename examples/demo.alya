@@ -21,7 +21,7 @@ function main()
     # 2. Structured Component Logger with Timestamps
     say "\n--- 2. Structured Component Logger with Timestamps ---"
     let app_log = log::create("ApiGateway", log::LogLevel.Debug)
-    log::set_timestamps(app_log, 1)
+    log::set_timestamps(app_log, true)
 
     log::debug(app_log, "Incoming request: GET /api/v1/users")
     log::info(app_log, "Handled 200 OK in 14ms")
@@ -30,7 +30,7 @@ function main()
     # 3. Structured Key-Value Fields (Text Format)
     say "\n--- 3. Structured Fields (Text Format) ---"
     let auth_log = log::create("AuthService", log::LogLevel.Info)
-    log::set_timestamps(auth_log, 1)
+    log::set_timestamps(auth_log, true)
     log::add_field(auth_log, "env", "production")
 
     let call_fields = [
@@ -70,15 +70,15 @@ function demo_rolling_file()
     # 5. Multi-Appender & File Rotation Demo
     say "\n--- 5. Rolling File Appender & Rotation ---"
     let demo_log = "demo_app.log"
-    if file_exists(demo_log) == 1
+    if file_exists(demo_log) == true
         remove_file(demo_log)
     end
-    if file_exists(demo_log + ".1") == 1
+    if file_exists(demo_log + ".1") == true
         remove_file(demo_log + ".1")
     end
 
     let file_log = log::create("RollingDemo", log::LogLevel.Info)
-    log::set_colored(file_log, 0)
+    log::set_colored(file_log, false)
     log::add_console(file_log)
     log::add_rolling_file(file_log, demo_log, 150, 3)
 
@@ -91,10 +91,10 @@ function demo_rolling_file()
     say "Backup .1 exists : " + str(file_exists(demo_log + ".1"))
 
     # Clean up demo files
-    if file_exists(demo_log) == 1
+    if file_exists(demo_log) == true
         remove_file(demo_log)
     end
-    if file_exists(demo_log + ".1") == 1
+    if file_exists(demo_log + ".1") == true
         remove_file(demo_log + ".1")
     end
 end

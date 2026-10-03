@@ -54,7 +54,7 @@ end
 ## `1` when emitted, `0` when filtered out.
 pub function logger_log(l: AppLogger, level: int, message) -> int
     if level < l.log_level or l.log_level == LogLevel.Off
-        return 0
+        return false
     end
 
     let rec = record_new(level, message, l.log_name, time(), l.log_fields)
@@ -69,7 +69,7 @@ pub function logger_log(l: AppLogger, level: int, message) -> int
     formatted = format_text(rec, l.log_colored, l.log_timestamps)
 
     logger_dispatch(l, formatted)
-    return 1
+    return true
 end
 
 ## Logs a message with call-site structured key-value fields.
@@ -84,7 +84,7 @@ end
 ## `1` when emitted, `0` when filtered out.
 pub function logger_log_with_fields(l: AppLogger, level: int, message, extra_fields: array) -> int
     if level < l.log_level or l.log_level == LogLevel.Off
-        return 0
+        return false
     end
 
     let all_fields = []
@@ -107,7 +107,7 @@ pub function logger_log_with_fields(l: AppLogger, level: int, message, extra_fie
     formatted = format_text(rec, l.log_colored, l.log_timestamps)
 
     logger_dispatch(l, formatted)
-    return 1
+    return true
 end
 
 ## Sets the minimum threshold log level.

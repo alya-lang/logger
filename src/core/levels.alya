@@ -69,7 +69,7 @@ pub function level_badge(lvl: int, colored: int) -> string
         badge += " "
     end
 
-    if colored == 0
+    if colored == false
         return badge
     end
 

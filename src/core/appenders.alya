@@ -46,7 +46,7 @@ pub function rotate_log_file(path: string, max_files: int) -> int
 
     # 1. Remove oldest backup if it exists
     let oldest = "{path}.{max_files}"
-    if file_exists(oldest) == 1
+    if file_exists(oldest) == true
         remove_file(oldest)
     end
 
@@ -56,7 +56,7 @@ pub function rotate_log_file(path: string, max_files: int) -> int
         let cur = "{path}.{i}"
         let nxt_num = i + 1
         let nxt = "{path}.{nxt_num}"
-        if file_exists(cur) == 1
+        if file_exists(cur) == true
             file_move(cur, nxt)
         end
         i -= 1
@@ -83,7 +83,7 @@ pub function append_to_rolling_file(path: string, line: string, max_size: int, m
     let content = "{clean}\n"
     let line_len = len(content)
 
-    if max_size > 0 and file_exists(path) == 1
+    if max_size > 0 and file_exists(path) == true
         let cur_size = file_size(path)
         if cur_size + line_len > max_size
             rotate_log_file(path, max_files)

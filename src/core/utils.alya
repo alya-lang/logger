@@ -80,11 +80,11 @@ pub function has_space(s: string) -> int
     while i < slen
         let c = char_at(s, i)
         if c in [" ", "\t", "\n", "\"", "="]
-            return 1
+            return true
         end
         i += 1
     end
-    return 0
+    return false
 end
 
 ## Escapes special characters for JSON encoding.
@@ -124,12 +124,12 @@ end
 ## ### Returns
 ## `1` on success, `0` when the source is missing.
 pub function file_copy(src: string, dst: string) -> int
-    if file_exists(src) == 0
-        return 0
+    if file_exists(src) == false
+        return false
     end
     let content = read_file(src)
     write_file(dst, content)
-    return 1
+    return true
 end
 
 ## Moves a file from src to dst.
@@ -141,9 +141,9 @@ end
 ## ### Returns
 ## `1` on success, `0` otherwise.
 pub function file_move(src: string, dst: string) -> int
-    if file_copy(src, dst) == 1
+    if file_copy(src, dst) == true
         remove_file(src)
-        return 1
+        return true
     end
-    return 0
+    return false
 end

@@ -107,7 +107,7 @@ end
 ## ### Parameters
 ## - `msg`: Message value.
 pub function log_trace(msg)
-    let badge = level_badge(LogLevel.Trace, 1)
+    let badge = level_badge(LogLevel.Trace, true)
     let body = str(msg)
     say "{badge} {body}"
 end
@@ -116,7 +116,7 @@ end
 ## ### Parameters
 ## - `msg`: Message value.
 pub function log_debug(msg)
-    let badge = level_badge(LogLevel.Debug, 1)
+    let badge = level_badge(LogLevel.Debug, true)
     let body = str(msg)
     say "{badge} {body}"
 end
@@ -125,7 +125,7 @@ end
 ## ### Parameters
 ## - `msg`: Message value.
 pub function log_info(msg)
-    let badge = level_badge(LogLevel.Info, 1)
+    let badge = level_badge(LogLevel.Info, true)
     let body = str(msg)
     say "{badge} {body}"
 end
@@ -134,7 +134,7 @@ end
 ## ### Parameters
 ## - `msg`: Message value.
 pub function log_warn(msg)
-    let badge = level_badge(LogLevel.Warn, 1)
+    let badge = level_badge(LogLevel.Warn, true)
     let body = str(msg)
     say "{badge} {body}"
 end
@@ -143,7 +143,7 @@ end
 ## ### Parameters
 ## - `msg`: Message value.
 pub function log_error(msg)
-    let badge = level_badge(LogLevel.Error, 1)
+    let badge = level_badge(LogLevel.Error, true)
     let body = str(msg)
     say "{badge} {body}"
 end
@@ -152,7 +152,7 @@ end
 ## ### Parameters
 ## - `msg`: Message value.
 pub function log_fatal(msg)
-    let badge = level_badge(LogLevel.Fatal, 1)
+    let badge = level_badge(LogLevel.Fatal, true)
     let body = str(msg)
     say "{badge} {body}"
 end

@@ -6,29 +6,29 @@ import "../src/lib.alya" as log
 @cfg(feature = "file")
 function file_appender_text(r)
     let test_file = "temp_appender_test.log"
-    if file_exists(test_file) == 1
+    if file_exists(test_file) == true
         remove_file(test_file)
     end
 
     # 2. File appender writing text logs
     let file_logger = log::create("FileApp", log::LogLevel.Info)
-    log::logger_set_colored(file_logger, 0)
+    log::logger_set_colored(file_logger, false)
     log::logger_add_file(file_logger, test_file)
 
     log::logger_info(file_logger, "Line 1: Server started")
     log::logger_warn(file_logger, "Line 2: High load warning")
     log::logger_debug(file_logger, "Line 3: Should be filtered out")
 
-    runner_assert_eq(r, file_exists(test_file), 1, "log file was created")
+    runner_assert_eq(r, file_exists(test_file), true, "log file was created")
     let content = read_file(test_file)
     runner_assert_true(r, len(content) > 0, "log file is not empty")
 
     # Check contents
     let has_line1 = log::has_space(content)
     runner_assert_true(r, has_line1, "content has space")
-    runner_assert_eq(r, log::ansi_strip(content) == content, 1, "no ANSI codes in file output")
+    runner_assert_eq(r, log::ansi_strip(content) == content, true, "no ANSI codes in file output")
 
-    if file_exists(test_file) == 1
+    if file_exists(test_file) == true
         remove_file(test_file)
     end
 end
@@ -38,7 +38,7 @@ end
 function json_file_logging(r)
     # 3. JSON format file logging
     let json_file = "temp_json_appender.log"
-    if file_exists(json_file) == 1
+    if file_exists(json_file) == true
         remove_file(json_file)
     end
 
@@ -48,11 +48,11 @@ function json_file_logging(r)
 
     log::logger_info(json_logger, "JSON event message")
 
-    runner_assert_eq(r, file_exists(json_file), 1, "json log file created")
+    runner_assert_eq(r, file_exists(json_file), true, "json log file created")
     let json_content = read_file(json_file)
     runner_assert_eq(r, char_at(json_content, 0), "{", "first char of file is {")
 
-    if file_exists(json_file) == 1
+    if file_exists(json_file) == true
         remove_file(json_file)
     end
 end
@@ -62,7 +62,7 @@ function main()
     let r = runner_new()
 
     let test_file = "temp_appender_test.log"
-    if file_exists(test_file) == 1
+    if file_exists(test_file) == true
         remove_file(test_file)
     end
 

@@ -41,10 +41,10 @@ function main()
     runner_assert_eq(r, log::level_from_str("invalid_str"), log::LogLevel.Info, "unknown defaults to INFO (2)")
 
     # 4. Badges without color
-    let b_trace = log::level_badge(log::LogLevel.Trace, 0)
-    let b_info  = log::level_badge(log::LogLevel.Info, 0)
-    let b_warn  = log::level_badge(log::LogLevel.Warn, 0)
-    let b_fatal = log::level_badge(log::LogLevel.Fatal, 0)
+    let b_trace = log::level_badge(log::LogLevel.Trace, false)
+    let b_info  = log::level_badge(log::LogLevel.Info, false)
+    let b_warn  = log::level_badge(log::LogLevel.Warn, false)
+    let b_fatal = log::level_badge(log::LogLevel.Fatal, false)
 
     runner_assert_str_eq(r, b_trace, "[TRACE]", "plain badge for TRACE")
     runner_assert_str_eq(r, b_info,  "[INFO] ", "plain badge for INFO padded to 7")
@@ -54,8 +54,8 @@ function main()
     runner_assert_eq(r, len(b_info),  7, "badge length is 7")
 
     # 5. Badges with ANSI color
-    let b_color_info = log::level_badge(log::LogLevel.Info, 1)
-    let b_color_warn = log::level_badge(log::LogLevel.Warn, 1)
+    let b_color_info = log::level_badge(log::LogLevel.Info, true)
+    let b_color_warn = log::level_badge(log::LogLevel.Warn, true)
     runner_assert_str_eq(r, log::ansi_strip(b_color_info), "[INFO] ", "stripping ANSI from colored badge yields plain")
     runner_assert_str_eq(r, log::ansi_strip(b_color_warn), "[WARN] ", "stripping ANSI from colored badge yields plain")
 

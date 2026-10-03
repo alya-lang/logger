@@ -11,8 +11,8 @@ function main()
     let l = log::create("TestApp", log::LogLevel.Info)
     runner_assert_str_eq(r, l.log_name, "TestApp", "logger name is TestApp")
     runner_assert_eq(r, l.log_level, log::LogLevel.Info, "default level is LOG_INFO")
-    runner_assert_eq(r, l.log_colored, 1, "colored is enabled by default")
-    runner_assert_eq(r, l.log_timestamps, 0, "timestamps are disabled by default")
+    runner_assert_eq(r, l.log_colored, true, "colored is enabled by default")
+    runner_assert_eq(r, l.log_timestamps, false, "timestamps are disabled by default")
     runner_assert_eq(r, l.log_format, log::LogFormat.Text, "default format is FORMAT_TEXT")
     runner_assert_eq(r, len(l.log_appenders), 0, "default appenders list is empty")
     runner_assert_eq(r, len(l.log_fields), 0, "default fields list is empty")
@@ -21,11 +21,11 @@ function main()
     log::logger_set_level(l, log::LogLevel.Debug)
     runner_assert_eq(r, l.log_level, log::LogLevel.Debug, "set_level updates to LOG_DEBUG")
 
-    log::logger_set_colored(l, 0)
-    runner_assert_eq(r, l.log_colored, 0, "set_colored updates to 0")
+    log::logger_set_colored(l, false)
+    runner_assert_eq(r, l.log_colored, false, "set_colored updates to 0")
 
-    log::logger_set_timestamps(l, 1)
-    runner_assert_eq(r, l.log_timestamps, 1, "set_timestamps updates to 1")
+    log::logger_set_timestamps(l, true)
+    runner_assert_eq(r, l.log_timestamps, true, "set_timestamps updates to 1")
 
     log::logger_set_format(l, log::LogFormat.Json)
     runner_assert_eq(r, l.log_format, log::LogFormat.Json, "set_format updates to FORMAT_JSON")
@@ -59,11 +59,11 @@ function main()
 
     # 6. Level filtering logic
     let filter_logger = log::create("FilterTest", log::LogLevel.Warn)
-    runner_assert_eq(r, log::logger_log(filter_logger, log::LogLevel.Debug, "Ignored"), 0, "DEBUG ignored when level is WARN")
-    runner_assert_eq(r, log::logger_log(filter_logger, log::LogLevel.Info, "Ignored"), 0, "INFO ignored when level is WARN")
+    runner_assert_eq(r, log::logger_log(filter_logger, log::LogLevel.Debug, "Ignored"), false, "DEBUG ignored when level is WARN")
+    runner_assert_eq(r, log::logger_log(filter_logger, log::LogLevel.Info, "Ignored"), false, "INFO ignored when level is WARN")
 
     let off_logger = log::create("OffTest", log::LogLevel.Off)
-    runner_assert_eq(r, log::logger_log(off_logger, log::LogLevel.Fatal, "Ignored"), 0, "FATAL ignored when level is OFF")
+    runner_assert_eq(r, log::logger_log(off_logger, log::LogLevel.Fatal, "Ignored"), false, "FATAL ignored when level is OFF")
 
     # 7. Struct methods
     let method_logger = log::create("MethodTest", log::LogLevel.Info)
@@ -72,9 +72,9 @@ function main()
     method_logger.add_field("subsystem", "cache")
     runner_assert_eq(r, len(method_logger.log_fields), 1, "method_logger.add_field works")
     let ret_log = method_logger.info("Test message via struct method")
-    runner_assert_eq(r, ret_log, 1, "method_logger.info works")
+    runner_assert_eq(r, ret_log, true, "method_logger.info works")
     let ret_dbg = method_logger.debug("Debug message via struct method")
-    runner_assert_eq(r, ret_dbg, 1, "method_logger.debug works")
+    runner_assert_eq(r, ret_dbg, true, "method_logger.debug works")
 
     # 8. Modern facades
     runner_assert_str_eq(r, log::strip_ansi("\e[32m[INFO ]\e[0m text"), "[INFO ] text", "strip_ansi removes ANSI escapes")

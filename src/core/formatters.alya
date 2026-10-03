@@ -17,14 +17,14 @@ import "./levels.alya"
 ## The formatted line string.
 pub function format_text(rec, colored: int, timestamps: int) -> string
     let prefix = ""
-    if timestamps == 1
+    if timestamps == true
         let ts_str = format_time_hms(rec.rec_time)
         prefix = prefix + "[{ts_str}] "
     end
 
     let target_str = str_from_ptr(rec.rec_target)
     if len(target_str) > 0
-        if colored == 1
+        if colored == true
             prefix = prefix + "\e[35m[{target_str}]\e[0m "
         else
             prefix = prefix + "[{target_str}] "
@@ -40,7 +40,7 @@ pub function format_text(rec, colored: int, timestamps: int) -> string
         for f in flds
             let k = str_from_ptr(f.fld_key)
             let v = str_from_ptr(f.fld_value)
-            if has_space(v) == 1
+            if has_space(v) == true
                 res = res + " {k}=\"{v}\""
             else
                 res = res + " {k}={v}"
