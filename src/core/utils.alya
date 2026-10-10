@@ -44,7 +44,7 @@ end
 ## The two-character string.
 pub function pad2(n: int) -> string
     if n < 10
-        return "0{n}"
+        return f"0{n}"
     end
     return str(n)
 end
@@ -64,7 +64,7 @@ pub function format_time_hms(secs: int) -> string
     let hh_str = pad2(hh)
     let mm_str = pad2(mm)
     let ss_str = pad2(ss)
-    return "{hh_str}:{mm_str}:{ss_str}"
+    return f"{hh_str}:{mm_str}:{ss_str}"
 end
 
 ## Checks whether a string holds characters requiring quoting.

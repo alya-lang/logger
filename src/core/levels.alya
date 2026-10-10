@@ -51,7 +51,7 @@ end
 # Private ANSI escape helper (internal encapsulation).
 function _ansi_esc(code: string, s) -> string
     let body = str_from_ptr(s)
-    return "\e[{code}m{body}\e[0m"
+    return f"\e[{code}m{body}\e[0m"
 end
 
 ## Returns a styled badge string for a log level with optional colors.
@@ -64,7 +64,7 @@ end
 ## The padded badge string (e.g. `"[INFO] "`).
 pub function level_badge(lvl: int, colored: int) -> string
     let name = level_to_str(lvl)
-    let badge = "[{name}]"
+    let badge = f"[{name}]"
     while len(badge) < 7
         badge += " "
     end

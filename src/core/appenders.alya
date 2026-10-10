@@ -23,7 +23,7 @@ end
 @cfg(feature = "file")
 pub function append_to_file(path: string, line: string)
     let clean = ansi_strip(line)
-    append_file(path, "{clean}\n")
+    append_file(path, f"{clean}\n")
 end
 
 ## Rotates a log file when it exceeds its size budget.
@@ -45,7 +45,7 @@ pub function rotate_log_file(path: string, max_files: int) -> int
     end
 
     # 1. Remove oldest backup if it exists
-    let oldest = "{path}.{max_files}"
+    let oldest = f"{path}.{max_files}"
     if file_exists(oldest) == true
         remove_file(oldest)
     end
@@ -53,9 +53,9 @@ pub function rotate_log_file(path: string, max_files: int) -> int
     # 2. Shift backups down (.2 -> .3, .1 -> .2)
     let i = max_files - 1
     while i >= 1
-        let cur = "{path}.{i}"
+        let cur = f"{path}.{i}"
         let nxt_num = i + 1
-        let nxt = "{path}.{nxt_num}"
+        let nxt = f"{path}.{nxt_num}"
         if file_exists(cur) == true
             file_move(cur, nxt)
         end
@@ -63,7 +63,7 @@ pub function rotate_log_file(path: string, max_files: int) -> int
     end
 
     # 3. Move current active log to .1
-    let first = "{path}.1"
+    let first = f"{path}.1"
     file_move(path, first)
     return 1
 end
@@ -80,7 +80,7 @@ end
 @cfg(feature = "file")
 pub function append_to_rolling_file(path: string, line: string, max_size: int, max_files: int)
     let clean = ansi_strip(line)
-    let content = "{clean}\n"
+    let content = f"{clean}\n"
     let line_len = len(content)
 
     if max_size > 0 and file_exists(path) == true

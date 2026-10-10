@@ -19,21 +19,21 @@ pub function format_text(rec, colored: int, timestamps: int) -> string
     let prefix = ""
     if timestamps == true
         let ts_str = format_time_hms(rec.rec_time)
-        prefix += "[{ts_str}] "
+        prefix += f"[{ts_str}] "
     end
 
     let target_str = str_from_ptr(rec.rec_target)
     if len(target_str) > 0
         if colored == true
-            prefix += "\e[35m[{target_str}]\e[0m "
+            prefix += f"\e[35m[{target_str}]\e[0m "
         else
-            prefix += "[{target_str}] "
+            prefix += f"[{target_str}] "
         end
     end
 
     let badge = level_badge(rec.rec_level, colored)
     let msg = str_from_ptr(rec.rec_msg)
-    let res = "{prefix}{badge} {msg}"
+    let res = f"{prefix}{badge} {msg}"
 
     let flds = rec.rec_fields
     if len(flds) > 0
@@ -41,9 +41,9 @@ pub function format_text(rec, colored: int, timestamps: int) -> string
             let k = str_from_ptr(f.fld_key)
             let v = str_from_ptr(f.fld_value)
             if has_space(v) == true
-                res += " {k}=\"{v}\""
+                res += f" {k}=\"{v}\""
             else
-                res += " {k}={v}"
+                res += f" {k}={v}"
             end
         end
     end
@@ -66,11 +66,11 @@ pub function format_json(rec) -> string
     let target = json_escape_str(rec.rec_target)
     let ts = rec.rec_time
 
-    let out = "{\"level\":\"{lvl}\",\"time\":{ts}"
+    let out = f"{{\"level\":\"{lvl}\",\"time\":{ts}"
     if len(target) > 0
-        out += ",\"target\":\"{target}\""
+        out += f",\"target\":\"{target}\""
     end
-    out += ",\"msg\":\"{msg}\""
+    out += f",\"msg\":\"{msg}\""
 
     let flds = rec.rec_fields
     let flen = len(flds)
@@ -82,7 +82,7 @@ pub function format_json(rec) -> string
             if i > 0
                 out += ","
             end
-            out += "\"{k}\":\"{v}\""
+            out += f"\"{k}\":\"{v}\""
         end
         out += "}"
     end

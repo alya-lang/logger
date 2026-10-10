@@ -109,7 +109,7 @@ end
 pub function log_trace(msg)
     let badge = level_badge(LogLevel.Trace, true)
     let body = str(msg)
-    say "{badge} {body}"
+    say f"{badge} {body}"
 end
 ## Quick global DEBUG logging directly to standard output.
 ##
@@ -118,7 +118,7 @@ end
 pub function log_debug(msg)
     let badge = level_badge(LogLevel.Debug, true)
     let body = str(msg)
-    say "{badge} {body}"
+    say f"{badge} {body}"
 end
 ## Quick global INFO logging directly to standard output.
 ##
@@ -127,7 +127,7 @@ end
 pub function log_info(msg)
     let badge = level_badge(LogLevel.Info, true)
     let body = str(msg)
-    say "{badge} {body}"
+    say f"{badge} {body}"
 end
 ## Quick global WARN logging directly to standard output.
 ##
@@ -136,7 +136,7 @@ end
 pub function log_warn(msg)
     let badge = level_badge(LogLevel.Warn, true)
     let body = str(msg)
-    say "{badge} {body}"
+    say f"{badge} {body}"
 end
 ## Quick global ERROR logging directly to standard output.
 ##
@@ -145,7 +145,7 @@ end
 pub function log_error(msg)
     let badge = level_badge(LogLevel.Error, true)
     let body = str(msg)
-    say "{badge} {body}"
+    say f"{badge} {body}"
 end
 ## Quick global FATAL logging directly to standard output.
 ##
@@ -154,7 +154,7 @@ end
 pub function log_fatal(msg)
     let badge = level_badge(LogLevel.Fatal, true)
     let body = str(msg)
-    say "{badge} {body}"
+    say f"{badge} {body}"
 end
 
 ## Emits an INFO level message using a target logger instance.
